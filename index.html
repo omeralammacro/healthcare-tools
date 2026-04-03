@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eligibility Leakage Prevention Tool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Revenue Integrity Workflow</p>
+        <h1>Eligibility Leakage Prevention Tool</h1>
+        <p class="hero-text">
+          Add multiple patients in one session, auto-fill payer routing from your insurance master,
+          keep the checker fixed for the batch, and export the final worklist as a PDF-ready report.
+        </p>
+      </div>
+      <div class="hero-card">
+        <div class="hero-stat">
+          <span class="hero-stat-label">Batch Controls</span>
+          <strong>Checker stays fixed across all patients</strong>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-label">Core Outcome</span>
+          <strong>READY / HOLD / ESCALATED</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="panel session-panel">
+      <div class="panel-heading">
+        <h2>Session Setup</h2>
+        <p>Select the checker once, then keep adding patient eligibility reviews into the batch.</p>
+      </div>
+      <div class="session-grid">
+        <label>
+          <span>Checker</span>
+          <input type="text" id="checkerName" placeholder="Eligibility checker name">
+        </label>
+        <label>
+          <span>Report Date</span>
+          <input type="date" id="reportDate">
+        </label>
+        <label class="session-toggle">
+          <span>Lock DOS For Batch</span>
+          <select id="lockDosMode">
+            <option value="off">Off</option>
+            <option value="on">On</option>
+          </select>
+        </label>
+        <label>
+          <span>Locked DOS</span>
+          <input type="date" id="lockedDos" placeholder="Used when lock is on">
+        </label>
+      </div>
+    </section>
+
+    <main class="workspace">
+      <section class="panel form-panel">
+        <div class="panel-heading">
+          <h2>Patient Eligibility Review</h2>
+          <p>Insurance and provider fields auto-populate details. Referral required follows auth required, with plan exceptions.</p>
+        </div>
+
+        <form id="eligibility-form" class="eligibility-form">
+          <div class="form-grid">
+            <label><span>DOS</span><input type="date" id="dos"></label>
+            <label><span>Patient Name</span><input type="text" id="patientName" placeholder="Patient full name"></label>
+            <label><span>MRN</span><input type="text" id="mrn" placeholder="Optional"></label>
+            <label><span>Provider</span><select id="provider"><option value="">Select provider</option></select></label>
+            <label><span>Visit Type</span><select id="visitType"><option value="">Select</option><option>New Patient</option><option>Follow-up</option><option>Procedure</option><option>Consult</option></select></label>
+            <label><span>Insurance Name</span><select id="insuranceName"><option value="">Select insurance</option></select></label>
+            <label><span>Payer ID</span><input type="text" id="payerId" placeholder="Auto-populates" readonly></label>
+            <label><span>Plan Type</span><select id="planType"><option value="">Select</option><option>HMO</option><option>PPO</option><option>POS</option><option>Medicare</option><option>Medicaid</option><option>Commercial</option><option>Other</option></select></label>
+            <label><span>Member ID</span><input type="text" id="memberId" placeholder="Member / subscriber ID"></label>
+            <label><span>Effective Date</span><input type="date" id="effectiveDate"></label>
+            <label><span>Termination Date</span><input type="date" id="terminationDate"></label>
+            <label><span>Provider NPI</span><input type="text" id="providerNpi" placeholder="Auto-populates" readonly></label>
+            <label><span>Street Address</span><input type="text" id="streetAddress" placeholder="Auto-populates" readonly></label>
+            <label><span>City</span><input type="text" id="city" placeholder="Auto-populates" readonly></label>
+            <label><span>State</span><input type="text" id="state" placeholder="Auto-populates" readonly></label>
+            <label><span>Zip Code</span><input type="text" id="zipCode" placeholder="Auto-populates" readonly></label>
+            <label><span>Copay</span><input type="text" id="copay" placeholder="$40"></label>
+            <label><span>Deductible Remaining</span><input type="text" id="deductibleRemaining" placeholder="$500"></label>
+            <label><span>Coinsurance</span><input type="text" id="coinsurance" placeholder="20%"></label>
+            <label><span>Out Of Pocket Total</span><input type="text" id="outOfPocketTotal" placeholder="$3,000"></label>
+            <label><span>Out Of Pocket Remaining</span><input type="text" id="outOfPocketRemaining" placeholder="$1,250"></label>
+            <label><span>Auth Number</span><input type="text" id="authNumber" placeholder="If approved"></label>
+          </div>
+
+          <div class="toggle-grid">
+            <label class="toggle-card"><span>Demographics Match Insurance</span><select id="demographicsMatch"><option value="">Select</option><option>Yes</option><option>No</option></select></label>
+            <label class="toggle-card"><span>Insurance Active For DOS</span><select id="insuranceActive"><option value="">Select</option><option>Yes</option><option>No</option><option>Unknown</option></select></label>
+            <label class="toggle-card"><span>Payer ID Verified</span><select id="payerVerified"><option value="">Select</option><option>Yes</option><option>No</option></select></label>
+            <label class="toggle-card"><span>Benefits Verified</span><select id="benefitsVerified"><option value="">Select</option><option>Yes</option><option>No</option></select></label>
+            <label class="toggle-card"><span>Authorization Required</span><select id="authRequired"><option value="">Select</option><option>No</option><option>Yes</option></select></label>
+            <label class="toggle-card"><span>Authorization Status</span><select id="authStatus"><option value="">Select</option><option>Not Required</option><option>Approved</option><option>Pending</option><option>Denied</option><option>Unknown</option></select></label>
+            <label class="toggle-card"><span>Referral Required</span><select id="referralRequired"><option value="">Select</option><option>No</option><option>Yes</option></select></label>
+            <label class="toggle-card"><span>COB Verified</span><select id="cobVerified"><option value="">Select</option><option>Yes</option><option>No</option><option>Unknown</option></select></label>
+            <label class="toggle-card"><span>Provider / Facility In Network</span><select id="networkStatus"><option value="">Select</option><option>In</option><option>Out</option><option>Unknown</option></select></label>
+          </div>
+
+          <label class="full-width">
+            <span>Additional Notes</span>
+            <textarea id="additionalNotes" rows="4" placeholder="Add portal source, call details, escalation comments, or special instructions."></textarea>
+          </label>
+
+          <div class="actions">
+            <button type="button" id="analyzeBtn" class="primary-btn">Analyze Current Patient</button>
+            <button type="button" id="addCaseBtn" class="primary-btn secondary">Add Patient To Batch</button>
+            <button type="reset" id="resetBtn" class="ghost-btn">Clear Patient Form</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="panel insights-panel">
+        <div class="panel-heading">
+          <h2>Leakage Guardrail</h2>
+          <p>The engine below converts missing or risky checkpoints into operational actions.</p>
+        </div>
+
+        <div class="status-banner" id="statusBanner">
+          <span class="status-label">Current Status</span>
+          <strong id="finalStatus">Awaiting Review</strong>
+        </div>
+
+        <div class="mini-grid">
+          <div class="mini-card"><span>Risk Count</span><strong id="riskCount">0</strong></div>
+          <div class="mini-card"><span>Primary Action</span><strong id="primaryAction">Complete review</strong></div>
+          <div class="mini-card"><span>Batch Size</span><strong id="batchCount">0</strong></div>
+          <div class="mini-card"><span>Checker</span><strong id="checkerDisplay">Not set</strong></div>
+        </div>
+
+        <div class="risk-section">
+          <h3>Detected Risks</h3>
+          <ul id="riskList" class="risk-list">
+            <li>No risks analyzed yet.</li>
+          </ul>
+        </div>
+
+        <div class="risk-section">
+          <h3>Generated Eligibility Note</h3>
+          <textarea id="generatedNote" rows="15" readonly placeholder="Your patient chart note will appear here."></textarea>
+          <div class="actions">
+            <button type="button" id="copyBtn" class="primary-btn secondary">Copy Note</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="panel batch-panel">
+      <div class="panel-heading">
+        <h2>Batch Tracker</h2>
+        <p>Each added patient stays in the session list and will be included in the PDF export.</p>
+      </div>
+
+      <div class="actions batch-actions">
+        <button type="button" id="exportPdfBtn" class="primary-btn">Export Batch To PDF</button>
+        <button type="button" id="clearBatchBtn" class="ghost-btn">Clear Batch</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="batch-table">
+          <thead>
+            <tr>
+              <th>Checker</th>
+              <th>DOS</th>
+              <th>Patient</th>
+              <th>MRN</th>
+              <th>Provider</th>
+              <th>Insurance</th>
+              <th>Plan</th>
+              <th>Payer ID</th>
+              <th>Auth</th>
+              <th>Referral</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="batchTableBody">
+            <tr><td colspan="11" class="empty-state">No patients added yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="./data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
