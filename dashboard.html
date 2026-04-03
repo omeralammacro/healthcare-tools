@@ -338,7 +338,20 @@ auth.onAuthStateChanged(async (user) => {
       userDoc = await db.collection('users').doc(user.uid).get();
     }
 
-    const userData = userDoc.data();
+    let userData = userDoc.data();
+
+    // Auto-sync: ensure admin always has access to all tools
+    if (userData.role === 'admin') {
+      const allToolIds = TOOLS.map(t => t.id);
+      const currentTools = userData.tools || [];
+      const missingTools = allToolIds.filter(id => !currentTools.includes(id));
+      if (missingTools.length > 0) {
+        await db.collection('users').doc(user.uid).update({
+          tools: allToolIds
+        });
+        userData.tools = allToolIds;
+      }
+    }
 
     if (userData.status === 'blocked') {
       alert('Your access has been revoked. Contact the administrator.');
