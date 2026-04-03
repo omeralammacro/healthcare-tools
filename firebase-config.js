@@ -58,5 +58,21 @@ const TOOLS = [
     file: "gGASTRO_Fax_SOP.html",
     icon: "📠",
     color: "#0d9488"
+  },
+  {
+    id: "patient_statement_calculator",
+    name: "Patient Statement Calculator",
+    description: "Calculate and generate patient statements for billing operations",
+    file: "Patient_Statement_Calculator.html",
+    icon: "🧮",
+    color: "#7c3aed"
+  },
+  {
+    id: "patient_statement_table_maker",
+    name: "Patient Statement Table Maker",
+    description: "Convert appointment data into formatted patient statement tables",
+    file: "Patient_Statement_Table_Maker.html",
+    icon: "📊",
+    color: "#d97706"
   }
 ];

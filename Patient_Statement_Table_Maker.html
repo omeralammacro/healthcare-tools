@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Data to Table Converter</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .instructions {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        .button-group {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 12px 30px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        .btn-generate {
+            background: #3498db;
+            color: white;
+        }
+        .btn-generate:hover {
+            background: #2980b9;
+        }
+        .btn-clear {
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-clear:hover {
+            background: #7f8c8d;
+        }
+        .btn-copy {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-copy:hover {
+            background: #229954;
+        }
+        #output {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        th {
+            background: #34495e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #2c3e50;
+        }
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        tr:hover {
+            background: #ecf0f1;
+        }
+        .patient-name {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 4px;
+            color: #2c3e50;
+        }
+        .patient-info {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+        .status-cell {
+            color: #e67e22;
+            font-weight: 500;
+        }
+        .message {
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Appointment Data to Table Converter</h1>
+        <p class="instructions">
+            Paste your appointment data below (including the header row), then click "Generate Table"
+        </p>
+        
+        <textarea id="inputData" placeholder="Paste your appointment data here...
+
+Example format:
+STATUS PATIENT TIME PROVIDER TYPE COPAY Pending arrival Brian Cohen 05/22/1959 M. (702) 334-7170 08:00 AM Ramanathan Muthaiah Follow-Up Visit No copay info Amount unknown"></textarea>
+        
+        <div class="button-group">
+            <button class="btn-generate" onclick="generateTable()">🔄 Generate Table</button>
+            <button class="btn-clear" onclick="clearAll()">🗑️ Clear</button>
+            <button class="btn-copy" onclick="copyTable()" id="copyBtn" style="display:none;">📋 Copy Table HTML</button>
+        </div>
+        
+        <div id="message"></div>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function generateTable() {
+            const input = document.getElementById('inputData').value.trim();
+            const messageDiv = document.getElementById('message');
+            const outputDiv = document.getElementById('output');
+            
+            if (!input) {
+                messageDiv.innerHTML = '<div class="message error">⚠️ Please paste your appointment data first.</div>';
+                return;
+            }
+
+            try {
+                // Parse the data more robustly
+                const rows = [];
+                
+                // Split by newlines and process
+                const lines = input.split(/\r?\n/).join(' ');
+                
+                // Remove header if present
+                let cleanData = lines.replace(/^STATUS\s+PATIENT\s+TIME\s+PROVIDER\s+TYPE\s+COPAY\s+/i, '');
+                
+                // Split by "Pending arrival" to identify each record
+                const records = cleanData.split(/Pending arrival/i).filter(r => r.trim());
+                
+                records.forEach(record => {
+                    // More flexible regex to capture all fields
+                    // Format: Name DOB M. Phone Time Provider Type "No copay info" Copay
+                    const pattern = /^\s*(.+?)\s+(\d{2}\/\d{2}\/\d{4})\s+M\.\s+([\(\)\d\-\s]+?)\s+(\d{1,2}:\d{2}\s+[AP]M)\s+(.+?)\s+(Follow-Up Visit|New Patient Visit|Office Procedure|Urgent Visit|PAP Smear\/Breast exam|Ultrasound)\s+No copay info\s+(.+?)$/i;
+                    
+                    const match = record.trim().match(pattern);
+                    
+                    if (match) {
+                        rows.push({
+                            status: 'Pending arrival',
+                            name: match[1].trim(),
+                            dob: match[2].trim(),
+                            phone: match[3].trim(),
+                            time: match[4].trim(),
+                            provider: match[5].trim(),
+                            type: match[6].trim(),
+                            copay: match[7].trim()
+                        });
+                    }
+                });
+
+                if (rows.length === 0) {
+                    messageDiv.innerHTML = '<div class="message error">⚠️ No valid appointment data found. Please check the format.</div>';
+                    return;
+                }
+
+                // Build the table
+                let tableHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Patient</th>
+                                <th>Time</th>
+                                <th>Provider</th>
+                                <th>Type</th>
+                                <th>Copay</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                rows.forEach(row => {
+                    tableHTML += `
+                        <tr>
+                            <td class="status-cell">${row.status}</td>
+                            <td>
+                                <span class="patient-name">${row.name}</span>
+                                <div class="patient-info">
+                                    ${row.dob}<br>
+                                    ${row.phone}
+                                </div>
+                            </td>
+                            <td>${row.time}</td>
+                            <td>${row.provider}</td>
+                            <td>${row.type}</td>
+                            <td>${row.copay}</td>
+                        </tr>
+                    `;
+                });
+
+                tableHTML += `
+                        </tbody>
+                    </table>
+                `;
+
+                outputDiv.innerHTML = tableHTML;
+                messageDiv.innerHTML = `<div class="message success">✅ Successfully converted ${rows.length} appointments!</div>`;
+                document.getElementById('copyBtn').style.display = 'inline-block';
+
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="message error">⚠️ Error processing data: ' + error.message + '</div>';
+                console.error(error);
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputData').value = '';
+            document.getElementById('output').innerHTML = '';
+            document.getElementById('message').innerHTML = '';
+            document.getElementById('copyBtn').style.display = 'none';
+        }
+
+        function copyTable() {
+            const table = document.querySelector('#output table');
+            if (!table) return;
+            
+            const range = document.createRange();
+            range.selectNode(table);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            
+            const btn = document.getElementById('copyBtn');
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Copied!';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
