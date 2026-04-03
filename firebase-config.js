@@ -24,7 +24,7 @@ const firebaseConfig = {
 const ADMIN_EMAIL = "nidhi@macrooutsourcing.net";
 
 // ============================================================
-//  TOOL DEFINITIONS — Your 3 tools
+//  TOOL DEFINITIONS — Your 4 tools
 // ============================================================
 const TOOLS = [
   {
@@ -50,5 +50,13 @@ const TOOLS = [
     file: "denial_workflow_guide.html",
     icon: "⚙️",
     color: "#2563a8"
+  },
+  {
+    id: "ggastro_fax_sop",
+    name: "gGASTRO Fax Processing SOP",
+    description: "Standard Operating Procedures for fax processing in gGASTRO system",
+    file: "gGASTRO_Fax_SOP.html",
+    icon: "📠",
+    color: "#0d9488"
   }
 ];

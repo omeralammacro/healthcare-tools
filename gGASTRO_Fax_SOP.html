@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gGASTRO — Fax Processing SOP</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #0a1628;
+    --ink:     #111827;
+    --slate:   #1e3a5f;
+    --teal:    #0d9488;
+    --teal-lt: #ccfbf1;
+    --amber:   #d97706;
+    --amber-lt:#fef3c7;
+    --red:     #dc2626;
+    --red-lt:  #fee2e2;
+    --purple:  #7c3aed;
+    --purple-lt:#ede9fe;
+    --sky:     #0284c7;
+    --sky-lt:  #e0f2fe;
+    --green:   #16a34a;
+    --green-lt:#dcfce7;
+    --mid:     #64748b;
+    --line:    #e2e8f0;
+    --card:    #ffffff;
+    --bg:      #f8fafc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Sora', sans-serif;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ─── HEADER ─── */
+  .hero {
+    background: var(--navy);
+    color: #fff;
+    padding: 60px 48px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 40px,
+      rgba(255,255,255,.018) 40px,
+      rgba(255,255,255,.018) 80px
+    );
+  }
+  .hero-inner { position: relative; max-width: 1100px; margin: auto; }
+  .hero-badge {
+    display: inline-block;
+    background: var(--teal);
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 4px;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 4vw, 48px);
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+  .hero h1 em { color: #5eead4; font-style: italic; }
+  .hero-sub {
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 300;
+    max-width: 620px;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 32px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+  .hero-meta-item { font-size: 12px; color: #64748b; }
+  .hero-meta-item strong { display: block; color: #cbd5e1; font-size: 13px; }
+
+  /* ─── LAYOUT ─── */
+  .page { max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin: 52px 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--navy);
+    margin-bottom: 16px;
+  }
+
+  /* ─── QUICK REFERENCE TABLE ─── */
+  .ref-table-wrap {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .ref-table thead tr {
+    background: var(--navy);
+    color: #fff;
+  }
+  .ref-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+  }
+  .ref-table tbody tr {
+    border-bottom: 1px solid var(--line);
+    transition: background .15s;
+  }
+  .ref-table tbody tr:last-child { border-bottom: none; }
+  .ref-table tbody tr:hover { background: #f1f5f9; }
+  .ref-table td {
+    padding: 11px 14px;
+    vertical-align: top;
+    font-size: 13px;
+  }
+  .ref-table td:first-child { font-weight: 600; color: var(--slate); }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-family: 'DM Mono', monospace;
+    white-space: nowrap;
+  }
+  .tag-teal    { background: var(--teal-lt);   color: #0f766e; }
+  .tag-amber   { background: var(--amber-lt);  color: #92400e; }
+  .tag-red     { background: var(--red-lt);    color: #991b1b; }
+  .tag-purple  { background: var(--purple-lt); color: #5b21b6; }
+  .tag-sky     { background: var(--sky-lt);    color: #075985; }
+  .tag-green   { background: var(--green-lt);  color: #166534; }
+  .tag-navy    { background: #dde3f0;          color: #1e3a5f; }
+  .tag-gray    { background: #f1f5f9;          color: #475569; }
+
+  /* ─── DETAIL CARDS ─── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    display: flex;
+    flex-direction: column;
+  }
+  .card-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .card-title { font-weight: 700; font-size: 13.5px; color: var(--navy); line-height: 1.3; }
+  .card-filename {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    color: var(--mid);
+    margin-top: 3px;
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    display: inline-block;
+  }
+  .card-body { padding: 14px 20px; flex: 1; }
+  .card-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: flex-start; }
+  .card-row-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--mid);
+    min-width: 70px;
+    padding-top: 2px;
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+  }
+  .card-row-val { font-size: 12.5px; color: var(--ink); }
+  .card-footer {
+    padding: 10px 20px 14px;
+    background: #f8fafc;
+    border-top: 1px solid var(--line);
+    font-size: 11.5px;
+    color: var(--mid);
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .card-footer .note-icon { font-size: 13px; margin-top: 1px; flex-shrink: 0; }
+
+  /* ─── EXCEPTIONS SECTION ─── */
+  .exc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .exc-card {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .exc-card-top {
+    padding: 14px 18px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .exc-bullet {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .exc-card-title { font-weight: 700; font-size: 13px; color: var(--navy); }
+  .exc-card-body {
+    padding: 0 18px 16px;
+    font-size: 12.5px;
+    color: #374151;
+    line-height: 1.65;
+  }
+  .exc-steps {
+    list-style: none;
+    counter-reset: step;
+    margin-top: 8px;
+  }
+  .exc-steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+  .exc-steps li::before {
+    content: counter(step);
+    background: var(--navy);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  /* ─── MISTAKES SECTION ─── */
+  .mistakes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .mistake-item {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    gap: 14px;
+    align-items: start;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    transition: box-shadow .15s;
+  }
+  .mistake-item:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+  .mistake-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--mid);
+    margin-top: 2px;
+  }
+  .mistake-content {}
+  .mistake-title { font-weight: 700; font-size: 13.5px; color: var(--navy); margin-bottom: 4px; }
+  .mistake-desc { font-size: 12.5px; color: #374151; line-height: 1.6; }
+  .mistake-fix {
+    font-size: 11.5px;
+    margin-top: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: var(--green-lt);
+    color: #166534;
+    font-weight: 500;
+  }
+  .mistake-fix::before { content: '✓ Fix: '; font-weight: 700; }
+  .sev-badge { padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 700; font-family: 'DM Mono', monospace; white-space: nowrap; }
+  .sev-high   { background: var(--red-lt);    color: #991b1b; }
+  .sev-med    { background: var(--amber-lt);  color: #92400e; }
+  .sev-low    { background: var(--sky-lt);    color: #075985; }
+
+  /* ─── FLOW CHART ─── */
+  .flow-wrap {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 32px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  }
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    row-gap: 16px;
+    justify-content: center;
+  }
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+  }
+  .flow-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    border: 2px solid transparent;
+  }
+  .flow-label { font-size: 11px; font-weight: 600; color: var(--navy); max-width: 80px; line-height: 1.3; }
+  .flow-arrow { font-size: 22px; color: var(--line); padding: 0 6px; margin-top: -22px; }
+
+  /* ─── STAFF TABLE ─── */
+  .staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .staff-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .staff-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-family: 'DM Serif Display', serif;
+  }
+  .staff-name { font-weight: 700; font-size: 13px; color: var(--navy); }
+  .staff-role { font-size: 11px; color: var(--mid); }
+
+  /* ─── INFO BOX ─── */
+  .info-box {
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .info-box .ib-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .info-box.warning { background: var(--amber-lt); border: 1px solid #fcd34d; color: #78350f; }
+  .info-box.danger  { background: var(--red-lt);   border: 1px solid #fca5a5; color: #7f1d1d; }
+  .info-box.tip     { background: var(--teal-lt);  border: 1px solid #5eead4; color: #134e4a; }
+  .info-box.info    { background: var(--sky-lt);   border: 1px solid #7dd3fc; color: #0c4a6e; }
+
+  @media print {
+    body { background: #fff; font-size: 12px; }
+    .hero { background: var(--navy) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { padding: 0 12px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Standard Operating Procedure</div>
+    <h1>gGASTRO <em>Fax Processing</em><br>& Task Allocation</h1>
+    <p class="hero-sub">Complete guide for receiving, identifying, renaming, filing, and tasking all inbound fax document types — including exceptions and common error prevention.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><strong>Version</strong>1.0</div>
+      <div class="hero-meta-item"><strong>Department</strong>Medical Records / Front Desk</div>
+      <div class="hero-meta-item"><strong>System</strong>gGASTRO EHR</div>
+      <div class="hero-meta-item"><strong>Last Updated</strong>2025</div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ─── MASTER WORKFLOW ─── -->
+  <div class="section-label">01 — Master Workflow</div>
+  <div class="flow-wrap">
+    <div style="text-align:center;margin-bottom:28px;">
+      <span style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--navy);">Every Fax — Start Here</span>
+    </div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-circle" style="background:var(--sky-lt);border-color:#7dd3fc;">📥</div>
+        <div class="flow-label">Fax Received</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-circle" style="background:var(--purple-lt);border-color:#c4b5fd;">🔍</div>
+        <div class="flow-label">Identify Type</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-circle" style="background:var(--amber-lt);border-color:#fcd34d;">🔎</div>
+        <div class="flow-label">Search Patient in EHR</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-circle" style="background:var(--red-lt);border-color:#fca5a5;">⚠️</div>
+        <div class="flow-label">Check for Exceptions</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-circle" style="background:var(--teal-lt);border-color:#5eead4;">✏️</div>
+        <div class="flow-label">Rename File</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-circle" style="background:var(--green-lt);border-color:#86efac;">📂</div>
+        <div class="flow-label">File Under Correct Category</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-circle" style="background:var(--navy);border-color:var(--slate);">📋</div>
+        <div class="flow-label" style="color:#fff;">Assign Task to Correct Staff</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── STAFF DIRECTORY ─── -->
+  <div class="section-label">02 — Staff Task Directory</div>
+  <div class="staff-grid">
+    <div class="staff-card"><div class="staff-avatar" style="background:#0d9488;">I</div><div><div class="staff-name">Irma</div><div class="staff-role">Medical Records Requests</div></div></div>
+    <div class="staff-card"><div class="staff-avatar" style="background:#7c3aed;">S</div><div><div class="staff-name">Shiv / Shivam</div><div class="staff-role">Records Check, Rx / Bowel Prep / Infusion Meds</div></div></div>
+    <div class="staff-card"><div class="staff-avatar" style="background:#d97706;">M</div><div><div class="staff-name">Mahima</div><div class="staff-role">Referral Loops, Auth (Office Visits)</div></div></div>
+    <div class="staff-card"><div class="staff-avatar" style="background:#0284c7;">D</div><div><div class="staff-name">Diana Barrios</div><div class="staff-role">Imaging Auth, Records (Imaging)</div></div></div>
+    <div class="staff-card"><div class="staff-avatar" style="background:#dc2626;">G</div><div><div class="staff-name">Galilea Alvarez</div><div class="staff-role">Referral Updates (Outgoing)</div></div></div>
+    <div class="staff-card"><div class="staff-avatar" style="background:#0f766e;">N</div><div><div class="staff-name">Nidhi</div><div class="staff-role">Refills / Pharmacy, Clearances, Cologuard (–)</div></div></div>
+    <div class="staff-card"><div class="staff-avatar" style="background:#1e3a5f;">DK</div><div><div class="staff-name">Danny &amp; Kathy</div><div class="staff-role">Procedure Auth, Clearance Cancellations</div></div></div>
+    <div class="staff-card"><div class="staff-avatar" style="background:#166534;">Ne</div><div><div class="staff-name">Neyda</div><div class="staff-role">Home Health / BrightStar</div></div></div>
+    <div class="staff-card"><div class="staff-avatar" style="background:#1d4ed8;">JH</div><div><div class="staff-name">Dr. James Han</div><div class="staff-role">Ambulatory PH Monitor Reports; Consult (No Upcoming Appt)</div></div></div>
+    <div class="staff-card"><div class="staff-avatar" style="background:#6b21a8;">Pr</div><div><div class="staff-name">Priyanka &amp; Nidhi</div><div class="staff-role">Procedure Clearances (CC)</div></div></div>
+    <div class="staff-card"><div class="staff-avatar" style="background:#9a3412;">DB</div><div><div class="staff-name">Daniela, Brenda, Kimberly</div><div class="staff-role">Procedure Clearances (CC)</div></div></div>
+    <div class="staff-card"><div class="staff-avatar" style="background:#115e59;">LP</div><div><div class="staff-name">Last Seen Provider</div><div class="staff-role">Records, Follow-Up, Consult, Imaging, Hospital, Lab</div></div></div>
+  </div>
+
+  <!-- ─── QUICK REFERENCE ─── -->
+  <div class="section-label">03 — Quick Reference: All Fax Types</div>
+  <div class="ref-table-wrap">
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Fax Type</th>
+          <th>Rename As</th>
+          <th>File Under</th>
+          <th>Dx Study?</th>
+          <th>Close Orders?</th>
+          <th>Task To</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Request for Medical Records</td>
+          <td><code>Request for medical records</code></td>
+          <td><span class="tag tag-navy">Request for Records</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Irma</td>
+        </tr>
+        <tr>
+          <td>Medical Records Received</td>
+          <td><code>Medical records from [Facility Name]</code></td>
+          <td><span class="tag tag-teal">Outside Office Visits</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Last seen provider (sign)</td>
+        </tr>
+        <tr>
+          <td>Follow-up Note</td>
+          <td><code>[Specialty] Follow-up from [Provider], [Facility]</code></td>
+          <td><span class="tag tag-teal">Outside Office Visits</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Last seen provider + message Mahima on Teams</td>
+        </tr>
+        <tr>
+          <td>Consult Note</td>
+          <td><code>Consult Note - [Facility Name]</code></td>
+          <td><span class="tag tag-teal">Outside Office Visits</span></td>
+          <td>—</td>
+          <td>✅ Add SNOMED CT</td>
+          <td>Last seen provider + message Mahima on Teams</td>
+        </tr>
+        <tr>
+          <td>Imaging</td>
+          <td><code>[Study Name] (Patient Name)</code></td>
+          <td><span class="tag tag-sky">Imaging Results</span></td>
+          <td>✅ Yes</td>
+          <td>✅ Yes</td>
+          <td>Last seen / ordering provider</td>
+        </tr>
+        <tr>
+          <td>Auth Approval — Procedure</td>
+          <td><code>Authorization Approval</code></td>
+          <td><span class="tag tag-amber">Insurance Authorizations</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Danny &amp; Kathy</td>
+        </tr>
+        <tr>
+          <td>Auth Approval — Office Visits</td>
+          <td><code>Authorization Approval</code></td>
+          <td><span class="tag tag-amber">Insurance Authorizations</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Mahima</td>
+        </tr>
+        <tr>
+          <td>Auth Approval — Imaging</td>
+          <td><code>Authorization Approval</code></td>
+          <td><span class="tag tag-amber">Insurance Authorizations</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Diana Barrios</td>
+        </tr>
+        <tr>
+          <td>Request for Medical Records — Imaging</td>
+          <td><code>Request for medical records</code></td>
+          <td><span class="tag tag-navy">Request for Records</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Diana Barrios</td>
+        </tr>
+        <tr>
+          <td>Lab Notification / Update</td>
+          <td><code>Tissue Receipt Notification - [Lab Name]</code></td>
+          <td><span class="tag tag-gray">General Correspondence</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Check who issued the order → Task ordering provider</td>
+        </tr>
+        <tr>
+          <td>Cardiac Clearance</td>
+          <td><code>Cardiac Clearance</code></td>
+          <td><span class="tag tag-purple">Procedure Clearance</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Daniela, Brenda, Kimberly, Procedure Provider, Priyanka, Nidhi</td>
+        </tr>
+        <tr>
+          <td>Pulmonology Clearance</td>
+          <td><code>Pulmonology Clearance</code></td>
+          <td><span class="tag tag-purple">Procedure Clearance</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Daniela, Brenda, Kimberly, Procedure Provider, Priyanka, Nidhi</td>
+        </tr>
+        <tr>
+          <td>Hospital Records</td>
+          <td><code>Hospital Records - [Hospital Name]</code></td>
+          <td><span class="tag tag-sky">Hospital Records</span></td>
+          <td>—</td>
+          <td>✅ Yes</td>
+          <td>Last seen provider (sign)</td>
+        </tr>
+        <tr>
+          <td>EGD W/ Pathology</td>
+          <td><code>EGD W/ pathology (Dr. [Provider Name])</code></td>
+          <td><span class="tag tag-teal">EGD-Procedure Note</span></td>
+          <td>✅ Findings=Postop, Reason=Preop</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Colonoscopy W/ Pathology</td>
+          <td><code>Colo W/ pathology (Dr. [Provider Name])</code></td>
+          <td>—</td>
+          <td>✅ Findings=Postop, Reason=Preop</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Lab Results</td>
+          <td><code>Lab Results - [Facility Name]</code></td>
+          <td><span class="tag tag-green">Clinical Lab Results</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Last seen provider (sign)</td>
+        </tr>
+        <tr>
+          <td>Referral Update</td>
+          <td><code>Referral Status Update Report - [Status]</code></td>
+          <td><span class="tag tag-gray">General Correspondence</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Galilea Alvarez (outgoing referral task)</td>
+        </tr>
+        <tr>
+          <td>Records Request — Multiple Patients</td>
+          <td><code>Request for medical records for multiple patients</code></td>
+          <td><span class="tag tag-navy">Request for Records</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Irma (send full list, no pre-checking)</td>
+        </tr>
+        <tr>
+          <td>Service Auth Update</td>
+          <td><code>Service Auth Update</code></td>
+          <td><span class="tag tag-amber">Insurance Authorizations</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Per specific case</td>
+        </tr>
+        <tr>
+          <td>Hospital Reminder</td>
+          <td><code>Reminder from [Hospital Name]</code></td>
+          <td><span class="tag tag-gray">General Correspondence</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Review to Provider</td>
+        </tr>
+        <tr>
+          <td>Plan of Treatment / Physical Orders</td>
+          <td><code>Plan of Treatment / Medication Profile</code></td>
+          <td><span class="tag tag-red">Prescription Requests</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Shivam</td>
+        </tr>
+        <tr>
+          <td>Bowel Prep Meds / Rx PA</td>
+          <td>Per medication name</td>
+          <td><span class="tag tag-red">Prescription Requests</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Shivam</td>
+        </tr>
+        <tr>
+          <td>Infusion Meds</td>
+          <td>Per medication name</td>
+          <td><span class="tag tag-red">Prescription Requests</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Shivam</td>
+        </tr>
+        <tr>
+          <td>Refills / Clarification / Pharmacy Update</td>
+          <td>Per content</td>
+          <td><span class="tag tag-red">Prescription Requests</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Nidhi</td>
+        </tr>
+        <tr>
+          <td>BrightStar Home Health</td>
+          <td><code>Home Health Certification and Plan of Care - BrightStar Care</code></td>
+          <td><span class="tag tag-gray">General Correspondence</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Neyda</td>
+        </tr>
+        <tr>
+          <td>Cologuard Results</td>
+          <td><code>Cologuard Results</code></td>
+          <td><span class="tag tag-green">Clinical Lab Results</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Negative → Nidhi &amp; Mahima | Positive → Ordering Provider</td>
+        </tr>
+        <tr>
+          <td>Pathology</td>
+          <td><code>Pathology ([Provider Name])</code></td>
+          <td><span class="tag tag-green">Pathology Results</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>Check who issued order → Task ordering provider</td>
+        </tr>
+        <tr>
+          <td>Ambulatory PH Monitor Report</td>
+          <td><code>Ambulatory PH Monitory Report</code></td>
+          <td><span class="tag tag-sky">Diagnostic Report</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td><strong>Always Dr. James Han</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ─── DETAILED CARDS ─── -->
+  <div class="section-label">04 — Detailed Processing Cards</div>
+  <div class="cards-grid">
+
+    <!-- Medical Records Request -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--navy);">📋</div>
+        <div>
+          <div class="card-title">Request for Medical Records</div>
+          <div class="card-filename">Request for medical records</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-row"><span class="card-row-label">File As</span><span class="card-row-val"><span class="tag tag-navy">Request for Records</span></span></div>
+        <div class="card-row"><span class="card-row-label">Task To</span><span class="card-row-val"><strong>Irma</strong></span></div>
+        <div class="card-row"><span class="card-row-label">Steps</span><span class="card-row-val">1. Search patient in gGASTRO<br>2. If found → check if records exist<br>3. If records missing → task Shiv to locate → reassign to Irma<br>4. If not found → see Exceptions</span></div>
+      </div>
+      <div class="card-footer"><span class="note-icon">📌</span>Sample MRNs: 27202, 14228, 56318, 64998, 65005</div>
+    </div>
+
+    <!-- Medical Records Received -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#0d9488;">📄</div>
+        <div>
+          <div class="card-title">Medical Records Received</div>
+          <div class="card-filename">Medical records from [Facility Name]</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-row"><span class="card-row-label">File As</span><span class="card-row-val"><span class="tag tag-teal">Outside Office Visits</span></span></div>
+        <div class="card-row"><span class="card-row-label">Task To</span><span class="card-row-val">Send for sign to <strong>last seen provider</strong></span></div>
+        <div class="card-row"><span class="card-row-label">Exceptions</span><span class="card-row-val">Maria Roy, Maria Jumalon, Erick Cartaya Aguilar, George Tan — discuss with Nidhi for correct provider assignment</span></div>
+      </div>
+      <div class="card-footer"><span class="note-icon">📌</span>Always include full facility name in rename. MRNs: 11123, 16204</div>
+    </div>
+
+    <!-- Follow-up Note -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#7c3aed;">🔄</div>
+        <div>
+          <div class="card-title">Follow-up Note</div>
+          <div class="card-filename">[Specialty] Follow-up from [Provider] - [Facility]</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-row"><span class="card-row-label">Example</span><span class="card-row-val"><em>Oncology Follow-up from Raja Mehdi, MD - Hope Cancer Care</em></span></div>
+        <div class="card-row"><span class="card-row-label">File As</span><span class="card-row-val"><span class="tag tag-teal">Outside Office Visits</span></span></div>
+        <div class="card-row"><span class="card-row-label">Task To</span><span class="card-row-val">Last seen provider (sign)</span></div>
+        <div class="card-row"><span class="card-row-label">Also</span><span class="card-row-val">Send Teams message to <strong>Mahima</strong>: <em>"MRN# Referral loop closed"</em></span></div>
+      </div>
+      <div class="card-footer"><span class="note-icon">📌</span>MRNs: 9765, 54702, 44155</div>
+    </div>
+
+    <!-- Consult Note -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#0284c7;">🏥</div>
+        <div>
+          <div class="card-title">Consult Note</div>
+          <div class="card-filename">Consult Note - [Facility Name]</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-row"><span class="card-row-label">Example</span><span class="card-row-val"><em>Consult Note - LV Surgery Associates</em></span></div>
+        <div class="card-row"><span class="card-row-label">File As</span><span class="card-row-val"><span class="tag tag-teal">Outside Office Visits</span></span></div>
+        <div class="card-row"><span class="card-row-label">Orders</span><span class="card-row-val">✅ Check for orders to close + add <strong>SNOMED CT</strong></span></div>
+        <div class="card-row"><span class="card-row-label">Task To</span><span class="card-row-val">Last seen provider (sign)</span></div>
+        <div class="card-row"><span class="card-row-label">Also</span><span class="card-row-val">Message <strong>Mahima</strong> on Teams: <em>"MRN# Referral loop closed"</em></span></div>
+        <div class="card-row"><span class="card-row-label">Special</span><span class="card-row-val">If patient last seen by Dr. George Tan with no upcoming appt → Task to <strong>Dr. James Han</strong></span></div>
+      </div>
+      <div class="card-footer"><span class="note-icon">📌</span>MRNs: 61339, 60898 — Always check SNOMED CT entry</div>
+    </div>
+
+    <!-- Imaging -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#d97706;">🩻</div>
+        <div>
+          <div class="card-title">Imaging</div>
+          <div class="card-filename">CT ABDOMEN &amp; PELVIS W/WO CONTRAST (Ms. Thelma Araracap)</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-row"><span class="card-row-label">File As</span><span class="card-row-val"><span class="tag tag-sky">Imaging Results</span></span></div>
+        <div class="card-row"><span class="card-row-label">Dx Study</span><span class="card-row-val">✅ Yes — complete Dx Study section</span></div>
+        <div class="card-row"><span class="card-row-label">Orders</span><span class="card-row-val">✅ Check for orders to close</span></div>
+        <div class="card-row"><span class="card-row-label">Task To</span><span class="card-row-val">Ordering physician or last seen provider</span></div>
+        <div class="card-row"><span class="card-row-label">Rename</span><span class="card-row-val">Include study type AND patient name in parentheses</span></div>
+      </div>
+      <div class="card-footer"><span class="note-icon">📌</span>MRNs: 61882, 56218, 61474, 61374</div>
+    </div>
+
+    <!-- Auth Approvals -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#dc2626;">🔐</div>
+        <div>
+          <div class="card-title">Authorization Approvals</div>
+          <div class="card-filename">Authorization Approval</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-row"><span class="card-row-label">File As</span><span class="card-row-val"><span class="tag tag-amber">Insurance Authorizations</span></span></div>
+        <div class="card-row"><span class="card-row-label">Procedure</span><span class="card-row-val">→ Task to <strong>Danny &amp; Kathy</strong></span></div>
+        <div class="card-row"><span class="card-row-label">Office Visit</span><span class="card-row-val">→ Task to <strong>Mahima</strong></span></div>
+        <div class="card-row"><span class="card-row-label">Imaging</span><span class="card-row-val">→ Task to <strong>Diana Barrios</strong></span></div>
+      </div>
+      <div class="card-footer"><span class="note-icon">⚠️</span>Identify auth TYPE before tasking — wrong assignment is a frequent error</div>
+    </div>
+
+    <!-- Clearances -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#6b21a8;">❤️</div>
+        <div>
+          <div class="card-title">Procedure Clearances (Cardiac / Pulmonology)</div>
+          <div class="card-filename">Cardiac Clearance / Pulmonology Clearance</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-row"><span class="card-row-label">File As</span><span class="card-row-val"><span class="tag tag-purple">Procedure Clearance</span></span></div>
+        <div class="card-row"><span class="card-row-label">Task To</span><span class="card-row-val">Daniela, Brenda, Kimberly, Procedure Provider, Priyanka &amp; Nidhi</span></div>
+        <div class="card-row"><span class="card-row-label">Pulm. Note</span><span class="card-row-val">If procedure is <strong>cancelled</strong> → task only to <strong>Danny &amp; Kathy</strong></span></div>
+        <div class="card-row"><span class="card-row-label">Cardiac Note</span><span class="card-row-val">Confirm procedure is scheduled with the correct Dr. before routing</span></div>
+      </div>
+      <div class="card-footer"><span class="note-icon">📌</span>MRN: 55829</div>
+    </div>
+
+    <!-- Hospital Records -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#0f766e;">🏨</div>
+        <div>
+          <div class="card-title">Hospital Records</div>
+          <div class="card-filename">Hospital Records - [Hospital Name]</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-row"><span class="card-row-label">File As</span><span class="card-row-val"><span class="tag tag-sky">Hospital Records</span></span></div>
+        <div class="card-row"><span class="card-row-label">Orders</span><span class="card-row-val">✅ Yes — close relevant orders</span></div>
+        <div class="card-row"><span class="card-row-label">Task To</span><span class="card-row-val">Last seen provider (sign)</span></div>
+      </div>
+      <div class="card-footer"><span class="note-icon">📌</span>MRN: 64766 — Always include full hospital name</div>
+    </div>
+
+    <!-- EGD / Colo w/ Pathology -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#166534;">🔬</div>
+        <div>
+          <div class="card-title">EGD / Colonoscopy W/ Pathology</div>
+          <div class="card-filename">EGD W/ pathology (Dr. [Name]) / Colo W/ pathology (Dr. [Name])</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-row"><span class="card-row-label">EGD File As</span><span class="card-row-val"><span class="tag tag-teal">EGD-Procedure Note</span></span></div>
+        <div class="card-row"><span class="card-row-label">Dx Study</span><span class="card-row-val">✅ Yes<br><strong>Findings</strong> = Postoperative<br><strong>Reason</strong> = Preoperative</span></div>
+        <div class="card-row"><span class="card-row-label">Task To</span><span class="card-row-val">Performing provider (Dr. mentioned in rename)</span></div>
+      </div>
+      <div class="card-footer"><span class="note-icon">⚠️</span>Always set Findings as Postoperative and Reason as Preoperative — never reverse these</div>
+    </div>
+
+    <!-- Cologuard -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#9a3412;">🧪</div>
+        <div>
+          <div class="card-title">Cologuard Results</div>
+          <div class="card-filename">Cologuard Results</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-row"><span class="card-row-label">File As</span><span class="card-row-val"><span class="tag tag-green">Clinical Lab Results</span></span></div>
+        <div class="card-row"><span class="card-row-label">If Negative</span><span class="card-row-val">→ Task to <strong>Nidhi &amp; Mahima</strong></span></div>
+        <div class="card-row"><span class="card-row-label">If Positive</span><span class="card-row-val">→ Task to <strong>Ordering Provider</strong></span></div>
+      </div>
+      <div class="card-footer"><span class="note-icon">📌</span>Per Dr. James Han (06/23/2025). MRNs: 62956, 63951</div>
+    </div>
+
+    <!-- Ambulatory PH -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#0369a1;">📊</div>
+        <div>
+          <div class="card-title">Ambulatory PH Monitor Report</div>
+          <div class="card-filename">Ambulatory PH Monitory Report</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-row"><span class="card-row-label">File As</span><span class="card-row-val"><span class="tag tag-sky">Diagnostic Report</span></span></div>
+        <div class="card-row"><span class="card-row-label">Task To</span><span class="card-row-val"><strong>ALWAYS Dr. James Han</strong> — no exceptions</span></div>
+      </div>
+      <div class="card-footer"><span class="note-icon">📌</span>Per Dr. Han (10/02/2025) — notified via RKG Teams chat by Nidhi</div>
+    </div>
+
+    <!-- Bowel Prep / Infusion Meds -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#be185d;">💊</div>
+        <div>
+          <div class="card-title">Bowel Prep Meds / Infusion Meds</div>
+          <div class="card-filename">Per medication name (Rx / PA context)</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-row"><span class="card-row-label">Task To</span><span class="card-row-val"><strong>Shivam</strong></span></div>
+        <div class="card-row"><span class="card-row-label">Bowel Prep</span><span class="card-row-val">Sutab, Suflave, Clenpiq, Plenvu, Gavilyte C/G/N, Suprep, SOD SUL-POTASS SOL</span></div>
+        <div class="card-row"><span class="card-row-label">Infusion</span><span class="card-row-val">Adalimumab, Infliximab, Skyrizi, Stelara, Tremfya, Omvoh, Entyvio, Rinvoq, Xeljanz, Zeposia, Dupixent</span></div>
+      </div>
+      <div class="card-footer"><span class="note-icon">📌</span>Refills/Alternatives → Nidhi. Infusion/Bowel Prep → Shivam.</div>
+    </div>
+
+  </div>
+
+  <!-- ─── EXCEPTIONS ─── -->
+  <div class="section-label">05 — Exceptions &amp; Special Scenarios</div>
+
+  <div class="info-box warning">
+    <span class="ib-icon">⚠️</span>
+    <span>Exceptions require additional steps before filing or tasking. Never rush past an exception — incorrect handling can result in documents going to the wrong chart, lost records, or missed clinical actions.</span>
+  </div>
+
+  <div class="exc-grid">
+
+    <!-- Multiple patients in one fax -->
+    <div class="exc-card">
+      <div class="exc-card-top">
+        <div class="exc-bullet" style="background:var(--red-lt);">👥</div>
+        <div class="exc-card-title">Single Fax Contains Multiple Patients</div>
+      </div>
+      <div class="exc-card-body">
+        <p>When one fax document contains information for more than one patient, you must split it before filing.</p>
+        <ol class="exc-steps">
+          <li>Identify every patient name/MRN appearing in the document.</li>
+          <li>Split the document into individual files — one per patient.</li>
+          <li>Rename each file correctly for its respective fax type.</li>
+          <li>File each document into the correct patient's chart in gGASTRO.</li>
+          <li>Task each document independently per the SOP for that fax type.</li>
+        </ol>
+        <p style="margin-top:8px;font-weight:600;color:var(--red);">⚠️ Never file a multi-patient document into a single chart.</p>
+      </div>
+    </div>
+
+    <!-- Patient Not Found in EHR -->
+    <div class="exc-card">
+      <div class="exc-card-top">
+        <div class="exc-bullet" style="background:var(--amber-lt);">❓</div>
+        <div class="exc-card-title">Patient Not Found in gGASTRO EHR</div>
+      </div>
+      <div class="exc-card-body">
+        <p>If you cannot locate the patient in gGASTRO after a thorough search, this may be a misdirected fax.</p>
+        <ol class="exc-steps">
+          <li>Search by full name, date of birth, and phone number — not just name alone.</li>
+          <li>Try alternate spellings or nicknames (e.g., Bob vs. Robert).</li>
+          <li>If still not found, check the fax header for the intended recipient's fax number — it may be a wrong-number fax.</li>
+          <li>Flag as a possible mistake fax and do NOT file it in any chart.</li>
+          <li>Notify your supervisor before discarding — the document may still need to be forwarded to the correct provider.</li>
+          <li>Document the incident with: fax date, sender info, patient name on fax, action taken.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Medical Records Request — Multiple Patients -->
+    <div class="exc-card">
+      <div class="exc-card-top">
+        <div class="exc-bullet" style="background:var(--sky-lt);">📋</div>
+        <div class="exc-card-title">Medical Records Request — Multiple Patients</div>
+      </div>
+      <div class="exc-card-body">
+        <p>When a single fax is a records <em>request</em> covering multiple patients (not records received):</p>
+        <ol class="exc-steps">
+          <li>Rename: <em>Request for medical records for multiple patients</em></li>
+          <li>File under: <span class="tag tag-navy" style="font-size:10px;">Request for Records</span></li>
+          <li>Task the entire list directly to <strong>Irma</strong> without pre-checking charts.</li>
+          <li>In the task note: "Sending full list — please check each patient and send me and Shiv a task from their chart if records are missing."</li>
+        </ol>
+        <p style="margin-top:8px;color:var(--mid);">MRN ref: 8066</p>
+      </div>
+    </div>
+
+    <!-- Consult — No Upcoming Appointment -->
+    <div class="exc-card">
+      <div class="exc-card-top">
+        <div class="exc-bullet" style="background:var(--purple-lt);">📅</div>
+        <div class="exc-card-title">Consult Note — Patient Has No Upcoming Appointment</div>
+      </div>
+      <div class="exc-card-body">
+        <p>If the patient was last seen by Dr. George Tan and has no upcoming appointment scheduled:</p>
+        <ol class="exc-steps">
+          <li>Do not task to Dr. George Tan's queue.</li>
+          <li>Task the consult note to <strong>Dr. James Han</strong> instead.</li>
+          <li>Include note: <em>"Patient last seen by Dr. George Tan on [date]. No upcoming appointment scheduled as of now."</em></li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Medical Records — Exception Providers -->
+    <div class="exc-card">
+      <div class="exc-card-top">
+        <div class="exc-bullet" style="background:var(--green-lt);">👩‍⚕️</div>
+        <div class="exc-card-title">Medical Records Received — Exception Providers</div>
+      </div>
+      <div class="exc-card-body">
+        <p>The following providers do NOT follow the standard "last seen provider" routing for received medical records:</p>
+        <ul style="margin:8px 0 8px 14px;font-size:12px;line-height:1.8;">
+          <li><strong>Maria Roy</strong></li>
+          <li><strong>Maria Jumalon</strong></li>
+          <li><strong>Erick Cartaya Aguilar</strong></li>
+          <li><strong>George Tan</strong></li>
+        </ul>
+        <ol class="exc-steps">
+          <li>Do not auto-assign to last seen provider.</li>
+          <li>Discuss with <strong>Nidhi</strong> to determine correct routing.</li>
+          <li>Wait for Nidhi's confirmation before tasking.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Pulmonology Clearance — Cancelled Procedure -->
+    <div class="exc-card">
+      <div class="exc-card-top">
+        <div class="exc-bullet" style="background:var(--red-lt);">🚫</div>
+        <div class="exc-card-title">Pulmonology Clearance — Procedure Cancelled</div>
+      </div>
+      <div class="exc-card-body">
+        <p>If a Pulmonology Clearance arrives but the procedure it relates to has been <strong>cancelled</strong>:</p>
+        <ol class="exc-steps">
+          <li>Verify that the procedure is in fact cancelled in gGASTRO.</li>
+          <li>Do NOT task to Daniela, Brenda, Kimberly, the procedure provider, Priyanka, or Nidhi.</li>
+          <li>Task the document <strong>only to Danny and Kathy</strong>.</li>
+          <li>Include a note explaining the procedure was cancelled.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Cologuard — Result-Dependent Routing -->
+    <div class="exc-card">
+      <div class="exc-card-top">
+        <div class="exc-bullet" style="background:var(--teal-lt);">🧬</div>
+        <div class="exc-card-title">Cologuard — Result-Dependent Routing</div>
+      </div>
+      <div class="exc-card-body">
+        <p>Routing for Cologuard results depends entirely on whether the result is positive or negative:</p>
+        <ol class="exc-steps">
+          <li>Read the result clearly — confirm Positive or Negative before any action.</li>
+          <li><strong>Negative:</strong> Task to Nidhi AND Mahima.</li>
+          <li><strong>Positive:</strong> Task to the ordering provider only.</li>
+          <li>Do not task a positive result to Nidhi/Mahima — they are for negatives only.</li>
+        </ol>
+        <p style="margin-top:8px;color:var(--mid);font-size:11px;">Instruction from Dr. James Han, 06/23/2025</p>
+      </div>
+    </div>
+
+    <!-- BrightStar -->
+    <div class="exc-card">
+      <div class="exc-card-top">
+        <div class="exc-bullet" style="background:var(--amber-lt);">🏠</div>
+        <div class="exc-card-title">BrightStar Home Health — Action Required</div>
+      </div>
+      <div class="exc-card-body">
+        <p>BrightStar faxes contain care plans that must be reviewed, signed, and returned.</p>
+        <ol class="exc-steps">
+          <li>Rename: <em>Home Health Certification and Plan of Care - BrightStar Care</em></li>
+          <li>File under: <span class="tag tag-gray" style="font-size:10px;">General Correspondence</span></li>
+          <li>Task to <strong>Neyda</strong> with note: "Please review, sign, and return to BrightStar Care as soon as possible."</li>
+        </ol>
+        <p style="margin-top:8px;color:var(--mid);">MRN: 3275 — note the return-to-sender requirement</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─── COMMON MISTAKES ─── -->
+  <div class="section-label">06 — Common Mistakes &amp; How to Avoid Them</div>
+  <div class="info-box danger">
+    <span class="ib-icon">🚨</span>
+    <span>These are the most frequent errors made when processing faxes. Read and review regularly — especially if you are new to the role.</span>
+  </div>
+
+  <div class="mistakes-list">
+
+    <div class="mistake-item">
+      <div class="mistake-num">01</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Tasking Auth Approval to the Wrong Person</div>
+        <div class="mistake-desc">Authorization approvals look identical regardless of type. Without identifying whether the auth is for a procedure, office visit, or imaging, the fax gets tasked incorrectly — delaying care or billing.</div>
+        <div class="mistake-fix">Always read the auth document to determine what it covers (procedure = Danny/Kathy, office visit = Mahima, imaging = Diana Barrios) before tasking.</div>
+      </div>
+      <span class="sev-badge sev-high">HIGH RISK</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">02</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Filing a Multi-Patient Fax Into One Chart</div>
+        <div class="mistake-desc">When a fax contains more than one patient's information, filing the entire document into the first patient's chart contaminates records — another patient's PHI is now visible where it shouldn't be.</div>
+        <div class="mistake-fix">Always scan the full fax before filing. If multiple patients are present, split the document before entering any chart.</div>
+      </div>
+      <span class="sev-badge sev-high">HIGH RISK</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">03</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Skipping the SNOMED CT Code on Consult Notes</div>
+        <div class="mistake-desc">Consult notes require orders to be checked and closed, and a SNOMED CT code to be added. Forgetting this step leaves open orders in the system and creates billing/coding inaccuracies.</div>
+        <div class="mistake-fix">Before tasking any Consult Note, always check for open orders and enter the SNOMED CT code. Make it a checklist item.</div>
+      </div>
+      <span class="sev-badge sev-high">HIGH RISK</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">04</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Not Searching the Patient Thoroughly Before Labeling a "Mistake Fax"</div>
+        <div class="mistake-desc">Declaring a fax misdirected without doing a full search (by DOB, phone, alternate name spelling) can result in legitimate patient documents being discarded and clinical actions missed.</div>
+        <div class="mistake-fix">Always search by name + DOB + phone. Try alternate spellings. Only escalate as "not found" after exhausting all search options.</div>
+      </div>
+      <span class="sev-badge sev-high">HIGH RISK</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">05</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Reversing Findings and Reason in EGD / Colo W/ Pathology</div>
+        <div class="mistake-desc">EGD and Colonoscopy with pathology require Findings = Postoperative and Reason = Preoperative. Reversing these causes incorrect Dx Study documentation and can affect clinical decision-making.</div>
+        <div class="mistake-fix">Memorize: Findings → Postoperative | Reason → Preoperative. Double-check before saving every EGD/Colo Dx Study entry.</div>
+      </div>
+      <span class="sev-badge sev-high">HIGH RISK</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">06</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Forgetting to Message Mahima on Teams for Consult Notes &amp; Follow-ups</div>
+        <div class="mistake-desc">Tasking the provider for signature is only half the job for Consult Notes and Follow-up Notes. The Teams message to Mahima ("MRN# Referral loop closed") is a separate, required step that is easy to forget.</div>
+        <div class="mistake-fix">Create a habit: after tasking the provider, immediately open Teams and send Mahima the MRN confirmation message before moving to the next fax.</div>
+      </div>
+      <span class="sev-badge sev-med">MEDIUM</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">07</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Tasking a Positive Cologuard Result to Nidhi &amp; Mahima</div>
+        <div class="mistake-desc">Positive Cologuard results must go to the ordering provider, not Nidhi and Mahima. Sending a positive result there means the clinical team may not see it promptly, delaying follow-up care.</div>
+        <div class="mistake-fix">Before tasking Cologuard: read the result. Negative = Nidhi + Mahima. Positive = ordering provider only.</div>
+      </div>
+      <span class="sev-badge sev-high">HIGH RISK</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">08</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Not Closing Orders for Imaging or Hospital Records</div>
+        <div class="mistake-desc">Imaging results and hospital records require open related orders to be closed in gGASTRO. Forgetting this leaves "pending" orders cluttering the system, causing confusion for providers and billing teams.</div>
+        <div class="mistake-fix">After filing Imaging or Hospital Records, always navigate to the Orders section and verify there are no open orders to close before tasking the provider.</div>
+      </div>
+      <span class="sev-badge sev-med">MEDIUM</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">09</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Using Incomplete or Vague File Names</div>
+        <div class="mistake-desc">Renaming a fax as just "Medical Records" or "Imaging" without specifying the facility or patient name makes documents extremely hard to locate later, especially in audits or when providers request specific records.</div>
+        <div class="mistake-fix">Always follow the full naming convention. Include facility names, provider names, and patient names exactly as specified in the SOP for each fax type.</div>
+      </div>
+      <span class="sev-badge sev-med">MEDIUM</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">10</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Filing Imaging as "Outside Office Visits" Instead of "Imaging Results"</div>
+        <div class="mistake-desc">Imaging documents are sometimes mistakenly filed under Outside Office Visits, especially if they arrive alongside other clinical notes. This breaks the EHR filing structure and makes imaging invisible in the correct location.</div>
+        <div class="mistake-fix">If the document contains an imaging study or radiology report — even if it came with other records — it belongs under "Imaging Results," not "Outside Office Visits."</div>
+      </div>
+      <span class="sev-badge sev-med">MEDIUM</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">11</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Routing Medical Records Exception Providers Without Checking With Nidhi</div>
+        <div class="mistake-desc">Maria Roy, Maria Jumalon, Erick Cartaya Aguilar, and George Tan have non-standard routing for received medical records. Auto-assigning to "last seen provider" for these four providers sends the document to the wrong place.</div>
+        <div class="mistake-fix">Memorize these four names. When you see them on a Medical Records Received fax, stop and ask Nidhi before tasking.</div>
+      </div>
+      <span class="sev-badge sev-med">MEDIUM</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">12</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Sending Pulmonology Clearance to Full Team When Procedure is Cancelled</div>
+        <div class="mistake-desc">Sending a clearance for a cancelled procedure to the full clearance team (Daniela, Brenda, Kimberly, etc.) causes unnecessary confusion and workload for staff whose patient no longer has an active procedure.</div>
+        <div class="mistake-fix">Always verify in gGASTRO whether the procedure is still active before routing a Pulmonology Clearance. If cancelled → Danny and Kathy only.</div>
+      </div>
+      <span class="sev-badge sev-low">LOW</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">13</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Forgetting the Dx Study Entry for Imaging Results</div>
+        <div class="mistake-desc">Imaging faxes require a Dx Study to be completed in gGASTRO. Skipping this means the study is not formally linked to the patient's diagnostic record, breaking the clinical documentation trail.</div>
+        <div class="mistake-fix">Treat "Dx Study = Yes" as a mandatory checkbox. After filing Imaging Results, complete the Dx Study section before moving on.</div>
+      </div>
+      <span class="sev-badge sev-med">MEDIUM</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">14</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Routing Ambulatory PH Monitor Reports to Anyone Other Than Dr. James Han</div>
+        <div class="mistake-desc">This report type has a standing instruction — it always goes to Dr. James Han, regardless of who ordered it or who the patient last saw. Any deviation breaks this standing clinical directive.</div>
+        <div class="mistake-fix">Ambulatory PH Monitor Report = Dr. James Han, every single time. No exceptions. This was a direct standing instruction from Dr. Han.</div>
+      </div>
+      <span class="sev-badge sev-high">HIGH RISK</span>
+    </div>
+
+    <div class="mistake-item">
+      <div class="mistake-num">15</div>
+      <div class="mistake-content">
+        <div class="mistake-title">Pre-Checking Records Before Passing Multi-Patient Records Request to Irma</div>
+        <div class="mistake-desc">For bulk records requests covering multiple patients, some staff attempt to verify each patient's records themselves before forwarding to Irma. This is incorrect — the SOP specifies to send the full list to Irma without pre-checking.</div>
+        <div class="mistake-fix">Send the complete list to Irma with the standard task note. Let Irma and Shiv handle the individual record checks from each patient's chart.</div>
+      </div>
+      <span class="sev-badge sev-low">LOW</span>
+    </div>
+
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <div style="margin-top:60px;padding:24px;background:var(--navy);border-radius:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+    <div>
+      <div style="font-family:'DM Serif Display',serif;font-size:18px;color:#fff;">gGASTRO Fax SOP</div>
+      <div style="font-size:11px;color:#64748b;margin-top:2px;">Internal Document — For Staff Use Only</div>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:#475569;">v1.0 &nbsp;·&nbsp; 2025 &nbsp;·&nbsp; All fax types covered</div>
+  </div>
+
+</div>
+</body>
+</html>
