@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Healthcare Tools Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+/* ---- Top Nav ---- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-logo {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.topbar-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: #0f172a;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.user-badge .name {
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.admin-link, .logout-btn {
+  padding: 8px 16px;
+  border: 1px solid #334155;
+  background: transparent;
+  color: #94a3b8;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.admin-link:hover, .logout-btn:hover {
+  background: #334155;
+  color: #f1f5f9;
+}
+
+.admin-link {
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+/* ---- Main Content ---- */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 32px;
+}
+
+.welcome-section {
+  margin-bottom: 40px;
+}
+
+.welcome-section h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.welcome-section p {
+  color: #94a3b8;
+  font-size: 15px;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.tool-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 28px;
+  transition: all 0.25s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--tool-color);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.tool-card:hover {
+  border-color: #475569;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.tool-card:hover::before {
+  opacity: 1;
+}
+
+.tool-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 16px;
+  background: var(--tool-color-light);
+}
+
+.tool-card h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.tool-card p {
+  color: #94a3b8;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  color: #60a5fa;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.open-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+/* ---- Empty State ---- */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-state h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #e2e8f0;
+}
+
+.empty-state p {
+  color: #64748b;
+  font-size: 14px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* ---- Loading ---- */
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading-spinner-lg {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #334155;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.hidden { display: none !important; }
+
+@media (max-width: 640px) {
+  .topbar { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
+  .main { padding: 24px 16px; }
+  .tools-grid { grid-template-columns: 1fr; }
+  .user-badge .name { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-spinner-lg"></div>
+  <div class="loading-text">Loading your tools...</div>
+</div>
+
+<!-- Main App (hidden until loaded) -->
+<div id="appContent" class="hidden">
+  <nav class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">+</div>
+      <span class="topbar-title">Healthcare Tools</span>
+    </div>
+    <div class="topbar-right">
+      <div class="user-badge">
+        <span class="name" id="userName"></span>
+        <span id="userRole"></span>
+      </div>
+      <a href="admin.html" class="admin-link hidden" id="adminLink">Admin Panel</a>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="welcome-section">
+      <h1 id="welcomeMsg">Welcome back</h1>
+      <p id="welcomeSub">Here are the tools you have access to</p>
+    </div>
+
+    <div class="tools-grid" id="toolsGrid"></div>
+
+    <div class="empty-state hidden" id="emptyState">
+      <div class="empty-icon">🔒</div>
+      <h2>No Tools Assigned Yet</h2>
+      <p>Your account is set up, but no tools have been assigned to you yet. Please contact the administrator to request access.</p>
+    </div>
+  </main>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  try {
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    if (!userDoc.exists) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    const userData = userDoc.data();
+
+    if (userData.status === 'blocked') {
+      alert('Your access has been revoked. Contact the administrator.');
+      auth.signOut();
+      return;
+    }
+
+    // Update UI
+    const displayName = userData.name || user.displayName || user.email.split('@')[0];
+    document.getElementById('userName').textContent = displayName;
+    document.getElementById('userRole').textContent = userData.role === 'admin' ? '(Admin)' : '';
+    document.getElementById('welcomeMsg').textContent = `Welcome back, ${displayName.split(' ')[0]}`;
+
+    // Show admin link if admin
+    if (userData.role === 'admin') {
+      document.getElementById('adminLink').classList.remove('hidden');
+    }
+
+    // Render tools
+    const userTools = userData.tools || [];
+    const grid = document.getElementById('toolsGrid');
+    grid.innerHTML = '';
+
+    const accessibleTools = TOOLS.filter(t => userTools.includes(t.id));
+
+    if (accessibleTools.length === 0) {
+      document.getElementById('emptyState').classList.remove('hidden');
+    } else {
+      accessibleTools.forEach(tool => {
+        const card = document.createElement('div');
+        card.className = 'tool-card';
+        card.style.setProperty('--tool-color', tool.color);
+        card.style.setProperty('--tool-color-light', tool.color + '20');
+        card.innerHTML = `
+          <div class="tool-icon" style="background: ${tool.color}20;">${tool.icon}</div>
+          <h3>${tool.name}</h3>
+          <p>${tool.description}</p>
+          <button class="open-btn" onclick="openTool('${tool.file}')">
+            Open Tool <span>&#8599;</span>
+          </button>
+        `;
+        card.addEventListener('click', (e) => {
+          if (!e.target.closest('.open-btn')) openTool(tool.file);
+        });
+        grid.appendChild(card);
+      });
+    }
+
+    // Show app
+    document.getElementById('loadingScreen').classList.add('hidden');
+    document.getElementById('appContent').classList.remove('hidden');
+
+  } catch (err) {
+    console.error('Error loading dashboard:', err);
+    alert('Error loading dashboard. Please try again.');
+  }
+});
+
+function openTool(file) {
+  window.open(file, '_blank');
+}
+
+function logout() {
+  auth.signOut().then(() => {
+    window.location.href = 'login.html';
+  });
+}
+</script>
+</body>
+</html>

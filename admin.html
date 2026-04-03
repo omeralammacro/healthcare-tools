@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Healthcare Tools Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+/* ---- Top Nav ---- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-logo {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.topbar-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-link {
+  padding: 8px 16px;
+  border: 1px solid #334155;
+  background: transparent;
+  color: #94a3b8;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.back-link:hover {
+  background: #334155;
+  color: #f1f5f9;
+}
+
+/* ---- Main ---- */
+.main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 32px;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.page-header p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* ---- Stats ---- */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 28px;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ---- Users Table ---- */
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.count-badge {
+  background: #334155;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.users-table-wrap {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table th {
+  text-align: left;
+  padding: 14px 20px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #64748b;
+  background: #162032;
+  font-weight: 600;
+  border-bottom: 1px solid #334155;
+}
+
+.users-table td {
+  padding: 14px 20px;
+  font-size: 14px;
+  border-bottom: 1px solid #1e293b;
+  vertical-align: middle;
+}
+
+.users-table tr:last-child td {
+  border-bottom: none;
+}
+
+.users-table tr:hover td {
+  background: #162032;
+}
+
+.user-email {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.user-name {
+  font-weight: 500;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.status-active {
+  background: #14532d40;
+  color: #4ade80;
+  border: 1px solid #16653440;
+}
+
+.status-pending {
+  background: #713f1240;
+  color: #fbbf24;
+  border: 1px solid #92400e40;
+}
+
+.status-blocked {
+  background: #7f1d1d40;
+  color: #f87171;
+  border: 1px solid #991b1b40;
+}
+
+/* Tool toggles */
+.tool-toggles {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tool-toggle {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #64748b;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tool-toggle.active {
+  background: #1d4ed820;
+  color: #60a5fa;
+  border-color: #3b82f640;
+}
+
+.tool-toggle:hover {
+  border-color: #475569;
+}
+
+/* Action buttons */
+.action-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.action-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.btn-activate {
+  background: #14532d;
+  color: #4ade80;
+}
+
+.btn-activate:hover {
+  background: #166534;
+}
+
+.btn-block {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+.btn-block:hover {
+  background: #991b1b;
+}
+
+.btn-unblock {
+  background: #1e3a5f;
+  color: #60a5fa;
+}
+
+.btn-unblock:hover {
+  background: #1e40af;
+}
+
+.btn-delete {
+  background: #450a0a;
+  color: #f87171;
+}
+
+.btn-delete:hover {
+  background: #7f1d1d;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 13px;
+  color: #e2e8f0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 999;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast.success {
+  border-color: #166534;
+}
+
+.toast.error {
+  border-color: #991b1b;
+}
+
+/* Loading */
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading-spinner-lg {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #334155;
+  border-top-color: #f59e0b;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text { color: #64748b; font-size: 14px; }
+.hidden { display: none !important; }
+
+.no-users {
+  text-align: center;
+  padding: 40px;
+  color: #475569;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .topbar { padding: 12px 16px; }
+  .main { padding: 20px 16px; }
+  .users-table-wrap { overflow-x: auto; }
+  .users-table { min-width: 700px; }
+}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-spinner-lg"></div>
+  <div class="loading-text">Loading admin panel...</div>
+</div>
+
+<div id="appContent" class="hidden">
+  <nav class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">&#9881;</div>
+      <span class="topbar-title">Admin Panel</span>
+    </div>
+    <div class="topbar-right">
+      <a href="dashboard.html" class="back-link">&#8592; Back to Dashboard</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="page-header">
+      <h1>User Management</h1>
+      <p>Grant or revoke tool access for members</p>
+    </div>
+
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-label">Total Users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color: #4ade80;" id="statActive">0</div>
+        <div class="stat-label">Active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color: #fbbf24;" id="statPending">0</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color: #f87171;" id="statBlocked">0</div>
+        <div class="stat-label">Blocked</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">All Users <span class="count-badge" id="userCount">0</span></h2>
+
+    <div class="users-table-wrap">
+      <table class="users-table" id="usersTable">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Status</th>
+            <th>Tool Access</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="usersBody">
+        </tbody>
+      </table>
+      <div class="no-users hidden" id="noUsers">No users found.</div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let currentAdminUid = null;
+
+// Toast notification
+function showToast(msg, type = 'success') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast show ' + type;
+  setTimeout(() => toast.className = 'toast', 3000);
+}
+
+// Auth check
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  currentAdminUid = user.uid;
+
+  // Verify admin role
+  const userDoc = await db.collection('users').doc(user.uid).get();
+  if (!userDoc.exists || userDoc.data().role !== 'admin') {
+    alert('Access denied. Admin only.');
+    window.location.href = 'dashboard.html';
+    return;
+  }
+
+  loadUsers();
+});
+
+// Load all users in real-time
+function loadUsers() {
+  db.collection('users').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+    const users = [];
+    snapshot.forEach(doc => {
+      users.push({ id: doc.id, ...doc.data() });
+    });
+    renderUsers(users);
+
+    // Update stats
+    document.getElementById('statTotal').textContent = users.length;
+    document.getElementById('statActive').textContent = users.filter(u => u.status === 'active').length;
+    document.getElementById('statPending').textContent = users.filter(u => u.status === 'pending').length;
+    document.getElementById('statBlocked').textContent = users.filter(u => u.status === 'blocked').length;
+    document.getElementById('userCount').textContent = users.length;
+
+    // Show app
+    document.getElementById('loadingScreen').classList.add('hidden');
+    document.getElementById('appContent').classList.remove('hidden');
+  });
+}
+
+function renderUsers(users) {
+  const tbody = document.getElementById('usersBody');
+  tbody.innerHTML = '';
+
+  if (users.length === 0) {
+    document.getElementById('noUsers').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('noUsers').classList.add('hidden');
+
+  users.forEach(user => {
+    const isAdmin = user.role === 'admin';
+    const isSelf = user.id === currentAdminUid;
+    const userTools = user.tools || [];
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="user-name">${escapeHtml(user.name || 'Unknown')} ${isAdmin ? '<span style="color:#f59e0b;font-size:11px;">(Admin)</span>' : ''}</div>
+        <div class="user-email">${escapeHtml(user.email || '')}</div>
+      </td>
+      <td>
+        <span class="status-badge status-${user.status || 'pending'}">${user.status || 'pending'}</span>
+      </td>
+      <td>
+        <div class="tool-toggles">
+          ${TOOLS.map(tool => `
+            <button class="tool-toggle ${userTools.includes(tool.id) ? 'active' : ''}"
+                    onclick="toggleTool('${user.id}', '${tool.id}', ${!userTools.includes(tool.id)})"
+                    ${isSelf ? 'disabled style="opacity:0.5;cursor:default;"' : ''}>
+              ${tool.icon} ${tool.name.split(' ')[0]}
+            </button>
+          `).join('')}
+        </div>
+      </td>
+      <td>
+        <div class="action-btns">
+          ${!isSelf ? buildActionButtons(user) : '<span style="color:#475569;font-size:12px;">You</span>'}
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function buildActionButtons(user) {
+  let html = '';
+
+  if (user.status === 'pending') {
+    html += `<button class="action-btn btn-activate" onclick="setStatus('${user.id}', 'active')">Activate</button>`;
+    html += `<button class="action-btn btn-block" onclick="setStatus('${user.id}', 'blocked')">Reject</button>`;
+  } else if (user.status === 'active') {
+    html += `<button class="action-btn btn-block" onclick="setStatus('${user.id}', 'blocked')">Block</button>`;
+  } else if (user.status === 'blocked') {
+    html += `<button class="action-btn btn-unblock" onclick="setStatus('${user.id}', 'active')">Unblock</button>`;
+  }
+
+  html += `<button class="action-btn btn-delete" onclick="deleteUser('${user.id}')">Delete</button>`;
+  return html;
+}
+
+// Toggle tool access for a user
+async function toggleTool(userId, toolId, grant) {
+  try {
+    if (grant) {
+      await db.collection('users').doc(userId).update({
+        tools: firebase.firestore.FieldValue.arrayUnion(toolId)
+      });
+      showToast(`Access granted: ${toolId}`);
+    } else {
+      await db.collection('users').doc(userId).update({
+        tools: firebase.firestore.FieldValue.arrayRemove(toolId)
+      });
+      showToast(`Access revoked: ${toolId}`);
+    }
+  } catch (err) {
+    showToast('Error updating access: ' + err.message, 'error');
+  }
+}
+
+// Set user status (active / blocked)
+async function setStatus(userId, status) {
+  try {
+    const update = { status };
+    // When activating, grant all tools by default
+    if (status === 'active') {
+      update.tools = TOOLS.map(t => t.id);
+    }
+    // When blocking, revoke all tools
+    if (status === 'blocked') {
+      update.tools = [];
+    }
+    await db.collection('users').doc(userId).update(update);
+    showToast(`User ${status === 'active' ? 'activated' : 'blocked'} successfully.`);
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
+
+// Delete user from Firestore
+async function deleteUser(userId) {
+  if (!confirm('Are you sure you want to delete this user? They can still sign up again.')) return;
+  try {
+    await db.collection('users').doc(userId).delete();
+    showToast('User deleted.');
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>

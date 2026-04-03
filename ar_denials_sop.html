@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AR Denials SOP — US Healthcare</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --surface2: #F0EFE9;
+    --border: #E2E0D8;
+    --border2: #C8C6BE;
+    --text: #1A1916;
+    --text2: #5A5850;
+    --text3: #8C8A82;
+    --accent: #1B4F72;
+    --accent-light: #EAF2FB;
+    --accent-mid: #2E86C1;
+    --red: #A93226;
+    --red-light: #FDEDEC;
+    --amber: #935116;
+    --amber-light: #FEF5E7;
+    --green: #1D6A39;
+    --green-light: #EAFAF1;
+    --purple: #6C3483;
+    --purple-light: #F5EEF8;
+    --teal: #0E6655;
+    --teal-light: #E8F8F5;
+    --coral: #A04000;
+    --coral-light: #FEF0E7;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--accent);
+    color: #fff;
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .header-left { flex: 1; }
+  .header-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    margin-bottom: 10px;
+    color: rgba(255,255,255,0.9);
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 6px;
+  }
+  .header-stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 18px;
+  }
+  .stat-pill {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    padding: 8px 16px;
+    text-align: center;
+  }
+  .stat-pill .num { font-size: 22px; font-weight: 600; color: #fff; }
+  .stat-pill .lbl { font-size: 11px; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    min-height: calc(100vh - 140px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    max-height: calc(100vh - 140px);
+    position: sticky;
+    top: 0;
+  }
+  .sidebar-search {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 10;
+  }
+  .sidebar-search input {
+    width: 100%;
+    padding: 9px 14px 9px 34px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .sidebar-search input:focus { border-color: var(--accent-mid); }
+  .search-icon {
+    position: absolute;
+    left: 28px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    font-size: 14px;
+  }
+  .search-wrap { position: relative; }
+
+  .category-section { border-bottom: 1px solid var(--border); }
+  .category-header {
+    padding: 10px 16px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cat-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .denial-item {
+    padding: 11px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .denial-item:hover { background: var(--accent-light); }
+  .denial-item.active {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent-mid);
+  }
+  .denial-item .code {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent-mid);
+    background: var(--accent-light);
+    border: 1px solid #B5D4F4;
+    border-radius: 4px;
+    padding: 2px 6px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .denial-item .name {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.4;
+    font-weight: 400;
+  }
+
+  /* MAIN PANEL */
+  .main-panel {
+    padding: 32px 36px;
+    overflow-y: auto;
+    max-height: calc(100vh - 140px);
+  }
+
+  .welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+    color: var(--text3);
+  }
+  .welcome-icon {
+    width: 72px; height: 72px;
+    background: var(--surface2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+  .welcome h2 { font-size: 20px; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
+  .welcome p { font-size: 14px; max-width: 320px; line-height: 1.6; }
+
+  /* DENIAL DETAIL */
+  .detail-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-cat-badge {
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .detail-title { flex: 1; }
+  .detail-title .code-large {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent-mid);
+    margin-bottom: 5px;
+  }
+  .detail-title h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .detail-title .definition {
+    font-size: 14px;
+    color: var(--text2);
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+
+  /* INFO GRID */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .info-card .ic-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+  .info-card .ic-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .priority-high { color: var(--red); }
+  .priority-med { color: var(--amber); }
+  .priority-low { color: var(--green); }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .tab-btn {
+    padding: 10px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: var(--text3);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* STEPS */
+  .steps-section { margin-bottom: 24px; }
+  .steps-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    margin-bottom: 14px;
+  }
+  .step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 26px; height: 26px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-body { flex: 1; }
+  .step-action {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .step-detail {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.55;
+  }
+
+  /* ALERTS / CALLOUTS */
+  .callout {
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { flex: 1; line-height: 1.55; }
+  .callout-title { font-weight: 600; margin-bottom: 3px; font-size: 13px; }
+  .callout.warn { background: var(--amber-light); color: var(--amber); border: 1px solid #F8C471; }
+  .callout.danger { background: var(--red-light); color: var(--red); border: 1px solid #F1948A; }
+  .callout.info { background: var(--accent-light); color: var(--accent); border: 1px solid #B5D4F4; }
+  .callout.success { background: var(--green-light); color: var(--green); border: 1px solid #82E0AA; }
+
+  /* CHECKLIST */
+  .checklist { margin: 0; padding: 0; list-style: none; }
+  .checklist li {
+    padding: 7px 0 7px 24px;
+    font-size: 13px;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    line-height: 1.5;
+  }
+  .checklist li::before {
+    content: "☐";
+    position: absolute; left: 0;
+    color: var(--accent-mid);
+    font-size: 14px;
+    top: 7px;
+  }
+  .checklist li:last-child { border-bottom: none; }
+
+  /* SCRIPT BOX */
+  .script-box {
+    background: #F0F4FA;
+    border: 1px solid #B5D4F4;
+    border-left: 3px solid var(--accent-mid);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--accent);
+    line-height: 1.65;
+    margin-bottom: 16px;
+  }
+  .script-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-mid);
+    margin-bottom: 6px;
+    font-style: normal;
+  }
+
+  /* TAGS */
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+
+  /* TIMELINE */
+  .timeline-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .tl-step {
+    flex: 1;
+    padding: 12px 14px;
+    font-size: 12px;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .tl-step:last-child { border-right: none; }
+  .tl-step .tl-num {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+    display: block;
+  }
+  .tl-step .tl-lbl {
+    color: var(--text3);
+    font-size: 11px;
+  }
+
+  /* SECTION TITLES */
+  .section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* PRINT / EXPORT NOTE */
+  .footer-strip {
+    background: var(--accent);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { max-height: 300px; position: static; }
+    .main-panel { max-height: none; }
+    .info-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-badge">Standard Operating Procedure</div>
+    <h1>AR Caller Denials Management SOP</h1>
+    <p class="header-sub">US Healthcare Revenue Cycle — Accounts Receivable</p>
+    <div class="header-stats">
+      <div class="stat-pill"><span class="num">38</span><span class="lbl">Denial Reasons</span></div>
+      <div class="stat-pill"><span class="num">8</span><span class="lbl">Categories</span></div>
+      <div class="stat-pill"><span class="num">100+</span><span class="lbl">Action Steps</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-search">
+      <div class="search-wrap">
+        <span class="search-icon">&#9740;</span>
+        <input type="text" id="searchInput" placeholder="Search denial reason..." oninput="filterDenials(this.value)">
+      </div>
+    </div>
+    <div id="denialList"></div>
+  </div>
+
+  <!-- MAIN PANEL -->
+  <div class="main-panel" id="mainPanel">
+    <div class="welcome">
+      <div class="welcome-icon">&#9776;</div>
+      <h2>Select a Denial Reason</h2>
+      <p>Click any denial reason from the left panel to view the full SOP, action steps, call scripts, and compliance notes.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer-strip">
+  AR Denials SOP &mdash; US Healthcare Revenue Cycle &mdash; For internal AR Caller use only &mdash; Updated 2025
+</div>
+
+<script>
+const categories = [
+  {
+    name: "Eligibility & Authorization",
+    color: "#2E86C1",
+    dot: "#2E86C1",
+    denials: [
+      {
+        code: "CO-27",
+        name: "Expenses incurred after coverage terminated",
+        priority: "High",
+        timely: "30 days",
+        appeal: "Yes",
+        definition: "Claim submitted for dates of service after the patient's insurance coverage ended or was terminated.",
+        steps: [
+          { action: "Verify coverage dates", detail: "Log into payer portal or call eligibility line. Confirm exact termination date of insurance coverage." },
+          { action: "Cross-check DOS vs coverage", detail: "Compare date of service on the claim against the eligibility span. Note any gap." },
+          { action: "Check for COBRA/continuation", detail: "Ask patient if they elected COBRA or enrolled in new insurance post-termination." },
+          { action: "Patient billing or insurance update", detail: "If no valid coverage: generate patient statement. If new insurance found: re-submit with corrected payer and effective dates." },
+          { action: "Document all findings", detail: "Note payer response, coverage dates confirmed, and action taken in account notes." }
+        ],
+        checklist: ["Verify DOS vs. termination date in payer portal","Confirm if COBRA was elected","Check for Medicaid as secondary","Update guarantor/insurance if new coverage found","Bill patient if no active coverage","Document outcome in billing system"],
+        script: "Hello, this is [Name] calling from [Provider] billing. I'm calling regarding claim number [Claim#] for patient [Patient Name], DOS [Date]. We received a denial under CO-27 indicating coverage was terminated. Can you confirm the exact termination date on file and whether there's any continuation coverage active?",
+        warning: "Do not write off without exhausting COBRA/new insurance verification. Check Medicaid eligibility for low-income patients.",
+        tip: "Use Availity, Change Healthcare, or the payer's IVR to verify eligibility in real time before calling."
+      },
+      {
+        code: "CO-15",
+        name: "Authorization / referral missing or invalid",
+        priority: "High",
+        timely: "30–45 days",
+        appeal: "Yes",
+        definition: "The service requires prior authorization or referral, which was not obtained or is invalid for the claim.",
+        steps: [
+          { action: "Pull the authorization on file", detail: "Check your billing system, EMR, and payer portal for any auth number tied to the account." },
+          { action: "Contact payer for retro-auth", detail: "If auth was not obtained: call payer and request retrospective authorization. Document the request reference number." },
+          { action: "Submit retro-auth request", detail: "Obtain clinical notes, operative reports, and physician attestation if required for retro-auth submission." },
+          { action: "Appeal with clinical justification", detail: "If retro-auth is denied, submit formal appeal with medical necessity documentation and supporting clinical records." },
+          { action: "Identify root cause for prevention", detail: "Flag internally whether auth was missed pre-service. Notify scheduling/front desk team to prevent recurrence." }
+        ],
+        checklist: ["Check billing system & EMR for auth number","Verify auth number matches CPT/DOS/provider","Request retro-auth from payer","Attach clinical notes to retro-auth request","File formal appeal if retro-auth denied","Log root cause for QA"],
+        script: "Hello, I'm calling from [Provider] about claim [Claim#], patient [Name], DOS [Date], denied CO-15 for missing authorization. I'd like to request a retrospective authorization review. Can you tell me the process and any supporting clinical documentation you'll need?",
+        warning: "Some payers do not allow retro-auth. Confirm payer-specific policy before spending time on the appeal.",
+        tip: "Always document the auth number in the billing note field AND the claim notes field to avoid CO-15 on resubmission."
+      },
+      {
+        code: "CO-4",
+        name: "Service/procedure inconsistent with modifier",
+        priority: "Medium",
+        timely: "30 days",
+        appeal: "Yes",
+        definition: "The modifier billed is inconsistent with the procedure code or the service rendered.",
+        steps: [
+          { action: "Review the CPT and modifier combination", detail: "Pull the EOB and confirm which modifier triggered the denial. Reference CMS modifier guidelines." },
+          { action: "Consult coding team", detail: "Have a certified coder review the op note or clinical documentation to confirm the correct modifier." },
+          { action: "Correct and resubmit", detail: "Update the modifier or CPT as appropriate and resubmit as a corrected claim." },
+          { action: "Appeal if modifier is correct", detail: "If clinical documentation supports the original modifier, draft an appeal with coding rationale and documentation." }
+        ],
+        checklist: ["Review EOB denial remark","Pull op note / clinical record","Consult certified coder","Correct modifier or CPT","Resubmit as corrected claim (F2 flag)","Appeal with coding rationale if needed"],
+        script: "I'm calling regarding denial CO-4 on claim [Claim#]. We believe the modifier submitted is supported by the clinical documentation. Can you clarify the specific inconsistency your system identified?",
+        warning: "Modifier 59 and XE/XS/XP/XU distinct procedural services are frequently misused. Ensure documentation clearly supports the modifier used.",
+        tip: "Reference AMA CPT guidelines and NCCI edits before resubmitting."
+      }
+    ]
+  },
+  {
+    name: "Billing & Coding Errors",
+    color: "#8E44AD",
+    dot: "#8E44AD",
+    denials: [
+      {
+        code: "CO-16",
+        name: "Claim lacks required information",
+        priority: "High",
+        timely: "30 days",
+        appeal: "Correct & resubmit",
+        definition: "The claim is missing mandatory data elements required by the payer for processing.",
+        steps: [
+          { action: "Review the EOB/RA for missing fields", detail: "Identify exactly which data element is missing (NPI, referral #, diagnosis, etc.) from the denial remark codes." },
+          { action: "Gather missing information", detail: "Contact clinical staff, front desk, or patient to obtain the missing detail." },
+          { action: "Correct and resubmit within timely filing", detail: "Update claim with accurate data. Resubmit as corrected claim with appropriate frequency code (7)." },
+          { action: "Document", detail: "Note what was missing, correction made, and date resubmitted." }
+        ],
+        checklist: ["Read EOB remark code carefully","Identify missing field","Obtain correct data from source","Resubmit as corrected claim","Confirm receipt by payer","Document action"],
+        script: "I'm calling about denial CO-16 on claim [Claim#]. Can you tell me specifically which data element is missing so we can correct and resubmit promptly?",
+        warning: "Do not resubmit as a new claim — always use corrected claim frequency code to avoid duplicate claim denials.",
+        tip: "Common missing items: referring provider NPI, patient DOB, ICD-10 codes, place of service code."
+      },
+      {
+        code: "CO-11",
+        name: "Diagnosis inconsistent with procedure",
+        priority: "High",
+        timely: "30 days",
+        appeal: "Yes",
+        definition: "The diagnosis code submitted does not support or align with the procedure billed.",
+        steps: [
+          { action: "Review clinical documentation", detail: "Pull progress notes, H&P, or operative report to confirm the clinical basis for the procedure." },
+          { action: "Coding review", detail: "Have coder verify if a more appropriate ICD-10 code exists to support the CPT code billed." },
+          { action: "Correct ICD-10 if applicable", detail: "Submit corrected claim with appropriate diagnosis." },
+          { action: "Appeal if correct", detail: "If diagnosis is accurate, submit appeal with physician attestation letter and supporting medical records." }
+        ],
+        checklist: ["Pull clinical documentation","Review CPT-to-ICD mapping","Consult certified coder","Correct ICD-10 if wrong","Resubmit corrected claim","Appeal with records if coding was correct"],
+        script: "I'm calling regarding CO-11 denial on claim [Claim#]. The procedure billed was [CPT] for diagnosis [ICD-10]. Can you clarify if you require a more specific ICD-10 or if there is a coverage policy issue with this combination?",
+        warning: "Be careful editing ICD-10 codes without clinical validation — upcoding or undercoding creates compliance risk.",
+        tip: "Use CMS LCD/NCD databases to check covered diagnoses for specific procedures."
+      },
+      {
+        code: "CO-97",
+        name: "Payment adjusted — benefit included in allowance",
+        priority: "Medium",
+        timely: "30 days",
+        appeal: "Yes",
+        definition: "The service billed is considered bundled into another procedure already paid, or is included in the global payment.",
+        steps: [
+          { action: "Identify the bundling edit", detail: "Check NCCI (National Correct Coding Initiative) edits for the CPT pair to confirm if bundling applies." },
+          { action: "Review modifier options", detail: "If services are clinically distinct, apply the appropriate modifier (59, XE, XP, XS, XU) and resubmit." },
+          { action: "Review global period", detail: "If denial is due to global surgery period, confirm if service qualifies as an exception (unrelated condition, etc.)." },
+          { action: "Appeal with documentation", detail: "Submit appeal with operative report or clinical notes demonstrating separate, distinct service." }
+        ],
+        checklist: ["Check NCCI edits for CPT pair","Determine if modifier applies","Review global surgery period","Add appropriate modifier","Resubmit with documentation","Appeal if bundling is incorrect"],
+        script: "I'm calling about CO-97 on claim [Claim#]. We believe the procedure [CPT] was a distinct service from [Other CPT] based on clinical documentation. Can you confirm if a modifier would allow separate reimbursement?",
+        warning: "Never add modifier 59 just to bypass a bundling edit — this must be clinically justified.",
+        tip: "The CMS NCCI edit table is free online and updated quarterly. Always cross-check before appealing."
+      },
+      {
+        code: "CO-4 / M56",
+        name: "Claim contains invalid or missing NDC code",
+        priority: "Medium",
+        timely: "30 days",
+        appeal: "Correct & resubmit",
+        definition: "A drug claim is missing or has an incorrect NDC (National Drug Code) which is required by many payers for medication billing.",
+        steps: [
+          { action: "Identify the drug billed", detail: "Pull the claim and confirm which J-code or drug was submitted." },
+          { action: "Obtain correct NDC", detail: "Get the NDC from the pharmacy/dispensing team or drug packaging." },
+          { action: "Add NDC in correct format", detail: "NDC must be in 11-digit format on the claim in the correct loop/segment (LIN segment on 837P)." },
+          { action: "Resubmit corrected claim", detail: "Submit with NDC, qualifier, unit of measure, and quantity." }
+        ],
+        checklist: ["Confirm J-code billed","Obtain 11-digit NDC from pharmacy","Verify NDC format requirement (payer-specific)","Add NDC to claim","Resubmit corrected claim"],
+        script: "I'm calling about [Claim#] denied for missing or invalid NDC on a drug claim. Can you confirm the exact format and loop you require for the NDC so we can resubmit correctly?",
+        warning: "NDC format and loop placement varies by payer. Confirm requirements before resubmitting.",
+        tip: "Keep an NDC crosswalk sheet for common J-codes your practice bills frequently."
+      }
+    ]
+  },
+  {
+    name: "Timely Filing",
+    color: "#CB4335",
+    dot: "#CB4335",
+    denials: [
+      {
+        code: "CO-29",
+        name: "Time limit for filing has expired",
+        priority: "High",
+        timely: "Depends on payer",
+        appeal: "Limited",
+        definition: "The claim was submitted after the payer's filing deadline has passed. Most payers allow 90–365 days from DOS.",
+        steps: [
+          { action: "Verify filing limit for this payer", detail: "Pull the payer contract or payer website to confirm the exact timely filing window." },
+          { action: "Gather proof of timely filing", detail: "If claim was submitted on time: locate clearinghouse transmission report, 277 acknowledgment, or certified mail receipt." },
+          { action: "Submit appeal with proof", detail: "Draft appeal letter with proof of timely filing attached. Clearinghouse reports are the strongest evidence." },
+          { action: "Check for exceptions", detail: "Some payers allow exceptions for: coordination of benefits delays, retroactive eligibility, system errors. Cite the specific exception in appeal." },
+          { action: "Write-off if no recourse", detail: "If timely filing truly missed and no exception applies, process as a write-off per policy. Do not bill patient for timely filing write-offs." }
+        ],
+        checklist: ["Confirm payer's timely filing limit","Pull clearinghouse transmission report","Pull 277CA acceptance report","Check if COB/retro-eligibility exception applies","Draft appeal with proof of timely submission","Write-off per policy if no recourse"],
+        script: "Hello, I'm calling about CO-29 denial on claim [Claim#]. We have documentation from our clearinghouse showing the claim was transmitted on [Date] — within your [X-day] timely filing window. I'd like to submit an appeal with this documentation. What is the correct fax number or portal for timely filing appeals?",
+        warning: "Never bill the patient for a timely filing write-off — this is a payer contractual adjustment.",
+        tip: "Implement a 30-60-90 day AR aging report to catch claims before they hit the timely filing deadline."
+      }
+    ]
+  },
+  {
+    name: "Medical Necessity",
+    color: "#1D8348",
+    dot: "#1D8348",
+    denials: [
+      {
+        code: "CO-50",
+        name: "Not medically necessary (non-covered)",
+        priority: "High",
+        timely: "30–60 days",
+        appeal: "Yes",
+        definition: "The payer has determined the service is not medically necessary based on clinical criteria, LCD, or NCD guidelines.",
+        steps: [
+          { action: "Pull the LCD/NCD or clinical policy", detail: "Identify the payer's Local Coverage Determination or National Coverage Determination that applies to this service." },
+          { action: "Review clinical documentation", detail: "Compare physician notes against coverage criteria. Does documentation clearly support medical necessity?" },
+          { action: "Obtain physician attestation", detail: "Ask the treating physician to write a detailed letter of medical necessity referencing specific patient condition and clinical indicators." },
+          { action: "Submit peer-to-peer review request", detail: "For high-value claims, request a peer-to-peer review with the payer's medical director. This can reverse denials." },
+          { action: "File formal appeal", detail: "Submit Level 1 appeal with clinical records, physician attestation, and citation of applicable guidelines (e.g., AHA, CMS)." },
+          { action: "Escalate if needed", detail: "If Level 1 denied: file Level 2 (external review). For Medicare: use the OMHA ALJ process." }
+        ],
+        checklist: ["Pull applicable LCD/NCD","Review documentation against coverage criteria","Request physician attestation letter","Request peer-to-peer review (within payer's window)","Submit Level 1 appeal with full clinical record","Escalate to Level 2 / ALJ if denied again"],
+        script: "I'm calling to request a peer-to-peer review regarding CO-50 denial on claim [Claim#] for patient [Name]. The treating physician is available to speak with your medical director. The denial appears to conflict with [cite guideline]. Can you schedule a peer-to-peer within the next 5 business days?",
+        warning: "Peer-to-peer requests usually have a short window (5–10 days from denial date). Do not delay.",
+        tip: "Always document peer-to-peer call: date, payer MD name, outcome, reference number."
+      },
+      {
+        code: "CO-57",
+        name: "Non-covered — not deemed medically necessary by payer",
+        priority: "High",
+        timely: "30 days",
+        appeal: "Yes",
+        definition: "Similar to CO-50, payer determined the specific treatment plan or level of care is not medically necessary per their clinical policies.",
+        steps: [
+          { action: "Request the denial rationale", detail: "Call payer and ask for the specific clinical criteria used to make the determination. Request the denial letter in writing." },
+          { action: "Compare to clinical guidelines", detail: "Review AHA, ACS, CMS, or specialty society guidelines that support the care provided." },
+          { action: "Compile appeal package", detail: "Include: denial letter, medical records, progress notes, test results, physician order, attestation letter, and guideline references." },
+          { action: "Submit appeal within deadline", detail: "File Level 1 appeal and track acknowledgment." }
+        ],
+        checklist: ["Request denial letter from payer","Review specific denial rationale","Compile clinical appeal packet","Attach applicable guideline references","Submit within appeal deadline","Track with payer reference number"],
+        script: "I'm calling about CO-57 on claim [Claim#]. Can you provide the specific clinical policy or criteria that was used to determine this service was not medically necessary? We'd like to submit an appeal with supporting documentation.",
+        warning: "For behavioral health / mental health claims — MHPAEA parity laws may apply. Cite parity if standard MN criteria seem inconsistent with med/surg benefit.",
+        tip: "Keep a library of payer-specific clinical policy numbers for your top 10 most common denied procedures."
+      },
+      {
+        code: "CO-167",
+        name: "Diagnosis is inconsistent with the patient's age",
+        priority: "Medium",
+        timely: "30 days",
+        appeal: "Yes",
+        definition: "The submitted ICD-10 diagnosis is typically not applicable for the patient's age group.",
+        steps: [
+          { action: "Verify patient's DOB", detail: "Confirm actual date of birth in the chart versus what was submitted on the claim." },
+          { action: "Review ICD-10 code", detail: "Check if the diagnosis has age-specific restrictions (pediatric or geriatric-specific codes)." },
+          { action: "Correct DOB or ICD-10", detail: "If DOB was submitted incorrectly: resubmit corrected claim. If diagnosis is correct but age appears unusual: submit appeal with clinical documentation." }
+        ],
+        checklist: ["Verify patient DOB on claim vs chart","Confirm ICD-10 age restrictions","Correct claim if DOB error","Appeal with clinical notes if clinically valid"],
+        script: "I'm calling about CO-167 on claim [Claim#]. The patient's date of birth is [DOB]. Can you confirm the age restriction on the diagnosis in question and advise if a corrected claim or appeal is the right next step?",
+        warning: "Some conditions (e.g., RSV in adults, congenital conditions in older patients) can legitimately appear outside typical age ranges. Always get physician attestation.",
+        tip: "ICD-10 CM guidelines include age-specific notes in tabular format — reference these before correcting."
+      }
+    ]
+  },
+  {
+    name: "Coordination of Benefits",
+    color: "#117A65",
+    dot: "#117A65",
+    denials: [
+      {
+        code: "CO-22",
+        name: "This care may be covered by another payer per COB",
+        priority: "High",
+        timely: "30–45 days",
+        appeal: "Yes",
+        definition: "The payer believes another insurance carrier is primary and should pay first under Coordination of Benefits (COB) rules.",
+        steps: [
+          { action: "Identify correct COB order", detail: "Determine which plan is primary using Medicare/Medicaid rules, birthday rule, or employer plan rules." },
+          { action: "Bill primary payer first", detail: "Submit claim to the primary payer. Obtain EOB from primary." },
+          { action: "Submit to secondary with primary EOB", detail: "Attach the primary EOB to the secondary claim and submit within the timely filing window." },
+          { action: "Update payer information in system", detail: "Correct the insurance order in your billing system to prevent future COB denials." }
+        ],
+        checklist: ["Confirm primary vs. secondary order","Bill primary first","Obtain primary EOB","Submit secondary claim with primary EOB attached","Update COB info in billing system","Document payer order in account notes"],
+        script: "I'm calling about CO-22 on claim [Claim#] for patient [Name]. We believe [Your Payer] is actually the primary based on [birthday rule / employer plan / Medicare COB rules]. Can you clarify your COB determination so we can ensure proper claim routing?",
+        warning: "Medicare as Secondary Payer (MSP) rules are complex. Verify MSP questionnaire is on file for all Medicare patients.",
+        tip: "Use CMS MSP resources and the BCRC (Benefits Coordination & Recovery Center) at 1-855-798-2627 for Medicare COB questions."
+      },
+      {
+        code: "CO-23",
+        name: "Claim payment adjusted — plan has been coordinated with other plans",
+        priority: "Medium",
+        timely: "30 days",
+        appeal: "Limited",
+        definition: "The payer reduced or adjusted payment because COB was applied and the total benefit from all plans cannot exceed the total charges.",
+        steps: [
+          { action: "Review EOB from both plans", detail: "Pull both primary and secondary EOBs. Verify that combined payment does not exceed patient's balance." },
+          { action: "Confirm allowed amounts", detail: "Compare allowed amounts and confirm if balance is patient responsibility or provider write-off per contract." },
+          { action: "Bill patient remaining balance", detail: "Post adjustments per contractual obligation. Bill patient any remaining co-pay, coinsurance, or deductible." }
+        ],
+        checklist: ["Pull both EOBs","Verify payment does not exceed total charges","Post primary payment and adjustment","Post secondary payment","Bill patient legitimate balance"],
+        script: "I'm reviewing COB adjustment on claim [Claim#]. Can you confirm the allowed amount and whether the patient has any remaining balance after both plans are applied?",
+        warning: "You cannot bill the patient more than the combined allowed amount under both plans.",
+        tip: "Train billing team on 'lesser of' COB rules to prevent overbilling patients in dual-coverage situations."
+      }
+    ]
+  },
+  {
+    name: "Duplicate / Administrative",
+    color: "#784212",
+    dot: "#784212",
+    denials: [
+      {
+        code: "CO-18",
+        name: "Exact duplicate of claim previously submitted",
+        priority: "Medium",
+        timely: "30 days",
+        appeal: "Yes",
+        definition: "The payer received two identical claims for the same patient, same service, same date, same provider.",
+        steps: [
+          { action: "Pull original claim and ERA", detail: "Locate the first submission in your billing system. Confirm if it was paid, denied, or pending." },
+          { action: "Check ERA for payment", detail: "Search EFT/ERA for any payment associated with the original claim." },
+          { action: "Void duplicate if paid", detail: "If original was paid: void/credit the duplicate in your system. No further action needed." },
+          { action: "Appeal with proof", detail: "If original was not paid but is not a true duplicate (different dates, different procedure): submit appeal with documentation of the differences." }
+        ],
+        checklist: ["Locate original claim in system","Confirm payment/denial status of original","Check ERA for EFT","Void duplicate in system if original paid","Appeal if not truly duplicate","Document outcome"],
+        script: "I'm calling about CO-18 on claim [Claim#]. Can you confirm what date the original claim was received and whether it was processed? I want to verify if we have a true duplicate or if there is a difference between the two claims.",
+        warning: "Do not void the original paid claim — only the duplicate submission.",
+        tip: "Set up duplicate claim edits in your clearinghouse to catch duplicates before they reach the payer."
+      },
+      {
+        code: "CO-B7",
+        name: "Provider not certified/eligible to perform service",
+        priority: "High",
+        timely: "30 days",
+        appeal: "Yes",
+        definition: "The billing or rendering provider is not credentialed, enrolled, or in-network with the payer for the service billed.",
+        steps: [
+          { action: "Check provider enrollment status", detail: "Log into PECOS (Medicare), payer portal, or call provider relations to verify enrollment and credentialing." },
+          { action: "Verify NPI and taxonomy", detail: "Confirm correct NPI (individual vs. group) and taxonomy code are on the claim." },
+          { action: "If not enrolled: initiate enrollment", detail: "Begin payer credentialing/enrollment process. Hold claims until provider is active." },
+          { action: "Appeal for retroactive credentialing", detail: "Some payers allow retro-credentialing if the provider was in the process of enrolling. Submit with enrollment application date." }
+        ],
+        checklist: ["Verify enrollment in payer portal/PECOS","Confirm NPI type (type 1 vs type 2)","Check taxonomy code on claim","Initiate enrollment if not credentialed","Submit retro-credentialing request if applicable","Hold future claims until approved"],
+        script: "I'm calling about CO-B7 on claim [Claim#]. Can you confirm the provider's current enrollment status? Provider NPI is [NPI], taxonomy [Taxonomy]. We want to understand if this is a credentialing gap or a claims submission error.",
+        warning: "Filing claims for a non-enrolled provider can be considered fraud. Escalate to compliance if this is systemic.",
+        tip: "Maintain a credentialing calendar with renewal dates for all providers and all payer contracts."
+      }
+    ]
+  },
+  {
+    name: "Patient Responsibility",
+    color: "#A04000",
+    dot: "#A04000",
+    denials: [
+      {
+        code: "CO-1",
+        name: "Deductible amount",
+        priority: "Low",
+        timely: "N/A",
+        appeal: "No — patient balance",
+        definition: "The claim was applied to the patient's annual deductible. This is the amount the patient must pay before insurance begins covering.",
+        steps: [
+          { action: "Verify deductible on EOB", detail: "Confirm the deductible amount applied and accumulator balance from the EOB." },
+          { action: "Post adjustment and balance", detail: "Post the contractual adjustment. Bill patient the deductible amount." },
+          { action: "Patient communication", detail: "Generate patient statement with clear explanation of the deductible application." },
+          { action: "Payment plan if needed", detail: "If patient cannot pay in full, set up a payment plan per your financial policy." }
+        ],
+        checklist: ["Post contractual adjustment","Post patient deductible balance","Generate patient statement","Offer payment plan if needed","Document patient communication"],
+        script: "Hello, I'm calling regarding your balance of $[Amount] for services on [Date]. Your insurance applied this to your deductible, which means it's your responsibility to pay. Would you like to pay today, or would a payment plan work better for you?",
+        warning: "Do not waive deductibles routinely — this can violate payer contracts and potentially constitute insurance fraud.",
+        tip: "Collect deductible estimates at time of service using real-time eligibility checks to reduce AR days."
+      },
+      {
+        code: "CO-2",
+        name: "Coinsurance amount",
+        priority: "Low",
+        timely: "N/A",
+        appeal: "No — patient balance",
+        definition: "The patient is responsible for a percentage of the allowed amount after the deductible is met (e.g., 20% coinsurance).",
+        steps: [
+          { action: "Verify coinsurance percentage on EOB", detail: "Confirm the coinsurance percentage from the patient's plan (usually 10–30%)." },
+          { action: "Post and bill patient", detail: "Post insurance payment and adjustment, then bill patient for coinsurance." },
+          { action: "Patient statement", detail: "Clearly explain the coinsurance calculation on the patient statement." }
+        ],
+        checklist: ["Confirm coinsurance % from EOB","Post insurance payment","Post contractual adjustment","Bill patient coinsurance","Offer payment plan"],
+        script: "Your insurance processed the claim and paid their share. The remaining balance of $[Amount] is your [20%] coinsurance. Would you like to make a payment today?",
+        warning: "Do not waive coinsurance without proper charity care documentation.",
+        tip: "Use patient portal payment reminders to reduce days in patient AR."
+      },
+      {
+        code: "CO-3",
+        name: "Co-payment amount",
+        priority: "Low",
+        timely: "N/A",
+        appeal: "No — patient balance",
+        definition: "A fixed amount the patient pays per visit as defined by their insurance plan.",
+        steps: [
+          { action: "Collect at time of service", detail: "Copay should ideally be collected at check-in. If not collected, post as patient balance." },
+          { action: "Bill patient", detail: "Generate statement for outstanding copay." },
+          { action: "Collections if needed", detail: "Follow collections workflow per policy for delinquent copays." }
+        ],
+        checklist: ["Confirm copay from EOB","Post patient copay balance if not collected","Bill patient","Follow collections process if delinquent"],
+        script: "Your insurance has processed your claim. There's a remaining copay of $[Amount] per your plan. Can we take a payment today?",
+        warning: "Repeatedly waiving copays is a federal compliance issue. Apply copay policy consistently.",
+        tip: "Post a copay collection script at the front desk and collect 100% at time of service to reduce AR."
+      }
+    ]
+  },
+  {
+    name: "Non-Covered / Exclusions",
+    color: "#7F8C8D",
+    dot: "#7F8C8D",
+    denials: [
+      {
+        code: "CO-96",
+        name: "Non-covered charge(s) — patient responsibility",
+        priority: "Medium",
+        timely: "N/A — may appeal",
+        appeal: "Check plan",
+        definition: "The service is not covered under the patient's benefit plan. Patient may be responsible for the charges.",
+        steps: [
+          { action: "Review plan benefits for non-coverage", detail: "Pull the patient's Summary of Benefits and Coverage (SBC) or call payer to confirm what the exclusion is." },
+          { action: "Check ABN / waiver on file", detail: "For Medicare patients: ensure Advance Beneficiary Notice (ABN) was signed. Without ABN, you may not bill the patient." },
+          { action: "Notify patient", detail: "Inform patient the service is not covered and explain their financial responsibility." },
+          { action: "Appeal if coverage in question", detail: "If the exclusion seems incorrect (e.g., gender-based exclusion for a covered group), appeal citing ERISA or applicable law." }
+        ],
+        checklist: ["Review plan benefit exclusions","Verify ABN for Medicare patients","Notify patient of non-coverage","Bill patient if ABN signed or non-Medicare","Appeal if exclusion violates ACA/ERISA","Document all communications"],
+        script: "I'm calling about CO-96 on claim [Claim#]. Can you confirm which specific benefit exclusion applies? We want to ensure we have the correct documentation for patient notification and any potential appeal.",
+        warning: "Never bill Medicare patients for non-covered services without a properly executed ABN on file.",
+        tip: "For recurring non-covered services, obtain an ABN upfront at time of scheduling."
+      },
+      {
+        code: "CO-49",
+        name: "This is a non-covered service because it is a routine/preventive exam",
+        priority: "Medium",
+        timely: "30 days",
+        appeal: "Yes",
+        definition: "The payer classified the visit or service as a routine/preventive exam which is excluded under the plan, often billed incorrectly under the wrong visit type.",
+        steps: [
+          { action: "Review E&M coding", detail: "Was the visit billed as preventive (99381–99397) or office visit (99202–99215)? Confirm what the physician documented." },
+          { action: "Separate sick vs. preventive", detail: "If a problem was addressed at a preventive visit, a separate E&M (with modifier 25) may be billable. Recode appropriately." },
+          { action: "Correct and resubmit", detail: "Update CPT code to reflect the nature of the service and resubmit." },
+          { action: "Patient billing", detail: "If the service is truly preventive and not covered under their plan, bill patient with proper notice." }
+        ],
+        checklist: ["Review CPT for preventive vs. E&M","Check if problem-oriented service was documented","Apply modifier 25 if separate E&M warranted","Correct and resubmit","Bill patient if truly non-covered preventive"],
+        script: "I'm calling about CO-49. The visit included both preventive services and a problem-oriented encounter documented separately. Can you confirm if modifier 25 on the E&M would allow separate processing?",
+        warning: "ACA requires coverage of preventive services without cost-sharing for in-network providers. If claim was for an ACA-mandated preventive service, appeal citing ACA requirements.",
+        tip: "Train providers on the importance of documenting problem-oriented encounters separately from preventive visits."
+      },
+      {
+        code: "OA-21",
+        name: "This service denied as member's health plan did not cover this service",
+        priority: "Medium",
+        timely: "30 days",
+        appeal: "Yes",
+        definition: "The service is simply not a covered benefit under this member's specific health plan.",
+        steps: [
+          { action: "Confirm benefit exclusion with payer", detail: "Call provider relations and ask for the specific benefit exclusion clause in writing." },
+          { action: "Check if external review applies", detail: "For urgent/serious conditions, the patient may have the right to an independent external review under ACA." },
+          { action: "Advise patient of options", detail: "Explain coverage gap to patient. Assist them in understanding their external review rights." },
+          { action: "Bill patient if applicable", detail: "Bill patient per your ABN and financial policy." }
+        ],
+        checklist: ["Confirm exclusion with payer in writing","Review external review eligibility","Advise patient of financial responsibility","Bill patient if appropriate","Document all steps"],
+        script: "I'd like to confirm the specific exclusion clause that applies to claim [Claim#]. Can you provide that in writing or direct me to the plan document reference? Also, is the patient entitled to an independent external review for this decision?",
+        warning: "ACA mandates external review rights for certain denied claims. Know your state's external review law.",
+        tip: "Maintain a payer-specific non-covered services list to improve pre-service patient financial counseling."
+      }
+    ]
+  }
+];
+
+function renderSidebar() {
+  const container = document.getElementById('denialList');
+  container.innerHTML = '';
+  categories.forEach(cat => {
+    const section = document.createElement('div');
+    section.className = 'category-section';
+    section.innerHTML = `<div class="category-header"><span class="cat-dot" style="background:${cat.dot}"></span>${cat.name}</div>`;
+    cat.denials.forEach(denial => {
+      const item = document.createElement('div');
+      item.className = 'denial-item';
+      item.dataset.code = denial.code;
+      item.dataset.catname = cat.name;
+      item.dataset.catcolor = cat.color;
+      item.innerHTML = `<span class="code">${denial.code}</span><span class="name">${denial.name}</span>`;
+      item.onclick = () => showDenial(denial, cat, item);
+      section.appendChild(item);
+    });
+    container.appendChild(section);
+  });
+}
+
+function filterDenials(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('.denial-item').forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(q) ? '' : 'none';
+  });
+  document.querySelectorAll('.category-section').forEach(sec => {
+    const visible = [...sec.querySelectorAll('.denial-item')].some(i => i.style.display !== 'none');
+    sec.style.display = visible ? '' : 'none';
+  });
+}
+
+function showDenial(denial, cat, el) {
+  document.querySelectorAll('.denial-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+
+  const priorityClass = denial.priority === 'High' ? 'priority-high' : denial.priority === 'Medium' ? 'priority-med' : 'priority-low';
+  const priorityIcon = denial.priority === 'High' ? '⚠' : denial.priority === 'Medium' ? '●' : '○';
+
+  const panel = document.getElementById('mainPanel');
+  panel.innerHTML = `
+    <div class="detail-header">
+      <div>
+        <div class="detail-cat-badge" style="background:${cat.color}22;color:${cat.color};border:1px solid ${cat.color}44;">${cat.name}</div>
+        <div style="margin-top:10px">
+          <div class="detail-title">
+            <div class="code-large">${denial.code}</div>
+            <h2>${denial.name}</h2>
+            <p class="definition">${denial.definition}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="ic-label">Priority</div>
+        <div class="ic-value ${priorityClass}">${priorityIcon} ${denial.priority}</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Appeal Timely Filing</div>
+        <div class="ic-value">${denial.timely}</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Appeal Available?</div>
+        <div class="ic-value">${denial.appeal}</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'tab-actions')">Action Steps</button>
+      <button class="tab-btn" onclick="switchTab(this, 'tab-call')">Call Script</button>
+      <button class="tab-btn" onclick="switchTab(this, 'tab-checklist')">Checklist</button>
+      <button class="tab-btn" onclick="switchTab(this, 'tab-notes')">Notes & Tips</button>
+    </div>
+
+    <div id="tab-actions" class="tab-content active">
+      <p class="steps-title">Step-by-step action plan</p>
+      ${denial.steps.map((s, i) => `
+        <div class="step">
+          <div class="step-num">${i + 1}</div>
+          <div class="step-body">
+            <div class="step-action">${s.action}</div>
+            <div class="step-detail">${s.detail}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div id="tab-call" class="tab-content">
+      <p class="steps-title">Suggested call script</p>
+      <div class="script-box">
+        <div class="script-label">Sample Script</div>
+        ${denial.script}
+      </div>
+      <div class="callout info">
+        <span class="callout-icon">ℹ</span>
+        <div class="callout-body"><b>Pro tip:</b> Always document the payer rep name, call reference number, date, and time after every call in the account notes.</div>
+      </div>
+    </div>
+
+    <div id="tab-checklist" class="tab-content">
+      <p class="steps-title">Action checklist</p>
+      <ul class="checklist">${denial.checklist.map(c => `<li>${c}</li>`).join('')}</ul>
+    </div>
+
+    <div id="tab-notes" class="tab-content">
+      <p class="steps-title">Compliance warnings</p>
+      <div class="callout danger">
+        <span class="callout-icon">!</span>
+        <div class="callout-body"><div class="callout-title">Warning</div>${denial.warning}</div>
+      </div>
+      <p class="steps-title" style="margin-top:20px">Efficiency tips</p>
+      <div class="callout success">
+        <span class="callout-icon">✓</span>
+        <div class="callout-body"><div class="callout-title">Tip</div>${denial.tip}</div>
+      </div>
+    </div>
+  `;
+}
+
+function switchTab(btn, tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+renderSidebar();
+</script>
+</body>
+</html>
