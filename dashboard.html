@@ -323,10 +323,20 @@ auth.onAuthStateChanged(async (user) => {
   }
 
   try {
-    const userDoc = await db.collection('users').doc(user.uid).get();
+    let userDoc = await db.collection('users').doc(user.uid).get();
+
+    // If user doc doesn't exist, create it now
     if (!userDoc.exists) {
-      window.location.href = 'login.html';
-      return;
+      const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+      await db.collection('users').doc(user.uid).set({
+        email: user.email,
+        name: user.displayName || user.email.split('@')[0],
+        role: isAdmin ? 'admin' : 'member',
+        tools: isAdmin ? TOOLS.map(t => t.id) : [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        status: isAdmin ? 'active' : 'pending'
+      });
+      userDoc = await db.collection('users').doc(user.uid).get();
     }
 
     const userData = userDoc.data();
@@ -384,7 +394,17 @@ auth.onAuthStateChanged(async (user) => {
 
   } catch (err) {
     console.error('Error loading dashboard:', err);
-    alert('Error loading dashboard. Please try again.');
+    // Show error on page instead of redirect loop
+    document.getElementById('loadingScreen').innerHTML = `
+      <div style="text-align:center;color:#f87171;padding:40px;">
+        <h2>Error Loading Dashboard</h2>
+        <p style="color:#94a3b8;margin:12px 0;">${err.message}</p>
+        <button onclick="auth.signOut().then(()=>location.href='login.html')"
+          style="margin-top:16px;padding:10px 24px;background:#3b82f6;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;">
+          Sign Out & Try Again
+        </button>
+      </div>
+    `;
   }
 });
 
