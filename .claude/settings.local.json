@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"C:/Users/Omer/Desktop/New folder \\(2\\)\")",
+      "Bash(where npm:*)",
+      "Bash(where node:*)",
+      "Bash(winget install:*)",
+      "Bash(where python:*)",
+      "Bash(where python3:*)",
+      "Bash(where npx:*)",
+      "Bash(where git:*)"
+    ]
+  }
+}
