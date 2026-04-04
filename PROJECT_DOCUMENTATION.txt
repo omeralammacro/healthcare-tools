@@ -1,0 +1,284 @@
+================================================================
+  MACRO OUTSOURCING - HEALTHCARE TOOLS PORTAL
+  Complete Project Documentation
+  Created: April 3, 2026
+================================================================
+
+OVERVIEW
+--------
+A web-based portal for Macro Outsourcing that allows team members
+to access healthcare tools through a login system. The admin can
+grant/revoke access to individual tools per user. 100% free setup.
+
+LIVE URL
+--------
+https://omeralammacro.github.io/healthcare-tools/login.html
+(Hosted on GitHub Pages - branch: index)
+
+================================================================
+TECHNOLOGY STACK (ALL FREE)
+================================================================
+1. GitHub Pages    - Hosts the website (HTML files)
+2. Firebase Auth   - Handles login/signup (Email/Password)
+3. Firebase Firestore - Stores user data & permissions
+4. No backend server needed - everything runs client-side
+
+================================================================
+FIREBASE PROJECT DETAILS
+================================================================
+- Project Name: TOOLS
+- Project ID: tools-48cd9
+- Firebase Console: https://console.firebase.google.com
+- Auth Domain: tools-48cd9.firebaseapp.com
+- Storage Bucket: tools-48cd9.firebasestorage.app
+- Messaging Sender ID: 389263765421
+- App ID: 1:389263765421:web:1c523ddfe6cad7d8fabb24
+- Measurement ID: G-338D7GY55P
+
+Firebase Services Enabled:
+- Authentication (Email/Password sign-in)
+- Firestore Database (test mode)
+- Realtime Database (was created but NOT used - ignore it)
+
+Firestore Rules (set in Firebase Console > Firestore > Rules):
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /users/{userId} {
+        allow read, write: if request.auth != null;
+      }
+    }
+  }
+
+================================================================
+ADMIN ACCOUNT
+================================================================
+- Admin Email: nidhi@macrooutsourcing.net
+- Admin Name: Rakesh Gupta (change in Firestore > users collection)
+- Admin has automatic access to ALL tools
+- New tools added to config are auto-synced for admin on login
+
+================================================================
+GITHUB REPOSITORY
+================================================================
+- Repo: https://github.com/omeralammacro/healthcare-tools
+- Branch used for deployment: index (NOT main)
+- GitHub Pages source: Branch "index", folder "/ (root)"
+- Git user configured locally as: omeralammacro
+
+To push updates:
+  cd "C:/Users/Omer/Desktop/New folder (2)"
+  git checkout index
+  git add <files>
+  git commit -m "description"
+  git push origin index
+
+================================================================
+ALL FILES IN THE PROJECT
+================================================================
+
+1. firebase-config.js
+   - Firebase connection keys
+   - ADMIN_EMAIL setting
+   - TOOLS array (list of all tools with id, name, description, file, icon, color)
+
+2. login.html
+   - Login/Signup page with Macro Outsourcing branding
+   - Uses Firebase Auth for email/password authentication
+   - Admin auto-detected by matching ADMIN_EMAIL
+   - New members get "pending" status until admin activates them
+   - Has password reset functionality
+
+3. dashboard.html
+   - Main tool dashboard shown after login
+   - Shows only tools the user has been granted access to
+   - Admin sees "Admin Panel" link in top-right
+   - Auto-syncs: if admin, automatically gets access to all tools
+   - Shows loading screen, then tools grid
+   - Has sign-out button
+   - If user doc missing in Firestore, creates it automatically
+
+4. admin.html
+   - Admin-only panel for managing users
+   - Shows stats: Total users, Active, Pending, Blocked
+   - User table with columns: User, Status, Tool Access, Actions
+   - Actions per user:
+     * Activate (pending -> active, grants all tools)
+     * Block (revokes all tools, user can't login)
+     * Unblock (restores access)
+     * Delete (removes user from Firestore)
+   - Tool toggles: click individual tool buttons to grant/revoke per tool
+   - Real-time updates via Firestore onSnapshot listener
+   - Only accessible by users with role "admin"
+
+5. logo.png
+   - Macro Outsourcing company logo
+   - Downloaded from https://www.macrooutsourcing.com/assets/img/mopl.png
+
+6. firestore.rules
+   - Reference file for Firestore security rules
+   - Must be manually set in Firebase Console > Firestore > Rules tab
+
+7. ar_denials_sop.html
+   - Tool: AR Denials SOP
+   - Standard Operating Procedures for AR Denials in US Healthcare
+
+8. index.html
+   - Tool: Eligibility Leakage Prevention
+   - Revenue integrity workflow for eligibility verification
+   - Note: This is also the default GitHub Pages landing page
+
+9. denial_workflow_guide.html
+   - Tool: Denial Management Workflow
+   - Complete denial management workflow guide for billing operations
+
+10. gGASTRO_Fax_SOP.html
+    - Tool: gGASTRO Fax Processing SOP
+    - Standard Operating Procedures for fax processing in gGASTRO
+
+11. Patient_Statement_Calculator.html
+    - Tool: Patient Statement Calculator
+    - Calculate and generate patient statements for billing
+
+12. Patient_Statement_Table_Maker.html
+    - Tool: Patient Statement Table Maker
+    - Convert appointment data into formatted patient statement tables
+
+================================================================
+TOOL IDS (used in Firestore for access control)
+================================================================
+1. ar_denials_sop
+2. eligibility_tool
+3. denial_workflow
+4. ggastro_fax_sop
+5. patient_statement_calculator
+6. patient_statement_table_maker
+
+================================================================
+HOW THE ACCESS SYSTEM WORKS
+================================================================
+
+1. USER SIGNS UP:
+   - Goes to login.html, clicks "Sign Up"
+   - Enters name, email, password
+   - Firebase Auth creates the account
+   - A Firestore document is created in "users" collection:
+     {
+       email: "user@email.com",
+       name: "User Name",
+       role: "member",          (or "admin" if email matches ADMIN_EMAIL)
+       tools: [],               (empty for members, all tools for admin)
+       status: "pending",       (or "active" for admin)
+       createdAt: timestamp
+     }
+   - Member sees "Account created! Wait for admin."
+   - Admin is redirected to dashboard immediately
+
+2. ADMIN ACTIVATES USER:
+   - Admin goes to Admin Panel
+   - Sees pending user in the table
+   - Clicks "Activate" -> status changes to "active", tools set to ALL
+   - Or can selectively toggle individual tools on/off
+
+3. USER LOGS IN:
+   - Dashboard checks Firestore for user's status and tools array
+   - If status is "blocked" -> signed out with error message
+   - If status is "active" -> shows only tools listed in their tools array
+   - If status is "pending" -> shows empty state (no tools assigned)
+
+4. ADMIN REVOKES ACCESS:
+   - Admin clicks "Block" -> status set to "blocked", tools cleared
+   - User is immediately locked out on next page load
+   - Admin can "Unblock" later to restore access
+
+================================================================
+HOW TO ADD A NEW TOOL IN THE FUTURE
+================================================================
+
+1. Place the HTML file in: C:/Users/Omer/Desktop/New folder (2)/
+
+2. Edit firebase-config.js, add to the TOOLS array:
+   {
+     id: "unique_tool_id",
+     name: "Tool Display Name",
+     description: "Short description of the tool",
+     file: "filename.html",
+     icon: "emoji_icon",
+     color: "#hex_color"
+   }
+
+3. Push to GitHub:
+   cd "C:/Users/Omer/Desktop/New folder (2)"
+   git checkout index
+   git add <new_file.html> firebase-config.js
+   git commit -m "Add new tool: Tool Name"
+   git push origin index
+
+4. Wait 1-2 minutes for GitHub Pages to update
+5. Admin automatically gets access (auto-sync in dashboard.html)
+6. For existing members: go to Admin Panel and toggle the new tool ON
+
+================================================================
+COMPANY BRANDING APPLIED
+================================================================
+- Company: Macro Outsourcing
+- Tagline: "Empowering US Doctors and Clinics with Seamless Workflow Solutions"
+- Logo: logo.png (from macrooutsourcing.com)
+- Website: https://www.macrooutsourcing.com/
+- Phone: +1 702 776 9767
+- Email: info@macrooutsourcing.com
+- LinkedIn: https://in.linkedin.com/company/macro-outsourcing-pvt.-ltd/
+
+Branding applied to:
+- login.html (logo, company name, tagline, footer with contact info)
+- dashboard.html (logo in topbar, company name)
+- admin.html (logo in topbar, company name)
+
+================================================================
+KNOWN ISSUES & NOTES
+================================================================
+
+1. The branch on GitHub is "index" (not "main") because GitHub
+   renamed it during initial push. Always push to "index" branch.
+
+2. index.html is both the Eligibility Tool AND the default GitHub
+   Pages landing page. If someone visits the root URL without
+   /login.html they'll see the tool directly (no auth).
+   Share only the /login.html URL.
+
+3. Firestore is in "test mode" — rules allow any authenticated
+   user to read/write. For production, tighten the rules to
+   only allow admin to modify other users' documents.
+
+4. The Realtime Database was accidentally created but is NOT used.
+   Only Firestore Database is used. You can ignore Realtime Database.
+
+5. Node.js is NOT installed on this PC. All deployments are done
+   via git push. Firebase CLI was not used.
+
+6. Branding changes (login, dashboard, admin pages with logo)
+   were committed but may need a final push — check if latest
+   changes are live.
+
+================================================================
+TROUBLESHOOTING
+================================================================
+
+Problem: Page keeps loading/refreshing
+Fix: Press Ctrl+Shift+R to hard refresh, or clear browser cache
+
+Problem: "Error loading dashboard"
+Fix: Check Firestore rules in Firebase Console are set correctly
+
+Problem: New tool not showing for admin
+Fix: Hard refresh (Ctrl+Shift+R), auto-sync adds new tools for admin
+
+Problem: Can't push to GitHub
+Fix: Make sure you're on "index" branch: git checkout index
+
+Problem: Firebase errors
+Fix: Check Firebase Console that Auth and Firestore are both enabled
+
+================================================================
+END OF DOCUMENTATION
+================================================================
