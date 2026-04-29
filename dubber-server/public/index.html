@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dubber Live Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: #1e293b; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 5; }
+.topbar h1 { font-size: 16px; font-weight: 600; }
+.topbar .meta { font-size: 12px; color: #94a3b8; display: flex; gap: 16px; align-items: center; }
+.topbar .dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; display: inline-block; margin-right: 6px; }
+.topbar .dot.err { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+.topbar input[type="date"] { background: #0f172a; border: 1px solid #334155; color: #e2e8f0; padding: 6px 10px; border-radius: 6px; font-family: inherit; font-size: 13px; }
+.topbar button { padding: 7px 14px; background: #2563eb; color: white; border: 0; border-radius: 6px; font-family: inherit; font-size: 13px; cursor: pointer; }
+.topbar button:hover { background: #1d4ed8; }
+
+.container { max-width: 1400px; margin: 0 auto; padding: 24px 28px; }
+
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 16px 18px; }
+.card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 8px; }
+.card .value { font-size: 28px; font-weight: 700; color: #f1f5f9; }
+.card .sub { font-size: 12px; color: #64748b; margin-top: 4px; }
+.card.in .value { color: #22d3ee; }
+.card.out .value { color: #f59e0b; }
+
+.section-title { font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin: 24px 0 12px; }
+
+table { width: 100%; border-collapse: collapse; background: #1e293b; border: 1px solid #334155; border-radius: 10px; overflow: hidden; }
+th, td { padding: 11px 14px; text-align: left; font-size: 13px; border-bottom: 1px solid #334155; }
+th { background: #0f172a; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; cursor: pointer; user-select: none; }
+th:hover { color: #e2e8f0; }
+tr:last-child td { border-bottom: 0; }
+tr:hover td { background: #233044; }
+td.num { font-variant-numeric: tabular-nums; text-align: right; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.badge.in { background: rgba(34, 211, 238, 0.15); color: #67e8f9; }
+.badge.out { background: rgba(245, 158, 11, 0.15); color: #fcd34d; }
+
+.timeline-row { padding: 10px 14px; border-bottom: 1px solid #334155; }
+.timeline-row:last-child { border-bottom: 0; }
+.timeline-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; }
+.timeline-name .stats { font-size: 11px; color: #94a3b8; font-weight: 400; }
+.timeline-bar { position: relative; height: 18px; background: #334155; border-radius: 4px; overflow: hidden; }
+.timeline-call { position: absolute; top: 0; bottom: 0; background: #22c55e; }
+.timeline-call.out { background: #f59e0b; }
+.timeline-break { position: absolute; top: 0; bottom: 0; background: rgba(239, 68, 68, 0.4); border-left: 1px solid #ef4444; border-right: 1px solid #ef4444; }
+.timeline-axis { display: flex; justify-content: space-between; font-size: 10px; color: #64748b; margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+.empty { text-align: center; padding: 40px; color: #64748b; font-size: 14px; }
+.error { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 16px; border-radius: 8px; color: #fca5a5; font-size: 13px; margin-bottom: 16px; white-space: pre-wrap; word-break: break-word; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1>Dubber Live Dashboard</h1>
+  <div class="meta">
+    <label>Date <input type="date" id="dateInput"></label>
+    <span><span class="dot" id="statusDot"></span><span id="statusText">connecting…</span></span>
+    <span id="lastUpdated"></span>
+    <button id="refreshBtn">Refresh</button>
+  </div>
+</div>
+
+<div class="container">
+  <div id="errorBox"></div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="section-title">Per-user breakdown</div>
+  <table id="userTable">
+    <thead>
+      <tr>
+        <th data-sort="name">User</th>
+        <th data-sort="calls" class="num">Total</th>
+        <th data-sort="incoming" class="num">Incoming</th>
+        <th data-sort="outgoing" class="num">Outgoing</th>
+        <th data-sort="totalCallSeconds" class="num">Talk time</th>
+        <th data-sort="breakCount" class="num">Breaks</th>
+        <th data-sort="totalBreakSeconds" class="num">Break time</th>
+        <th data-sort="firstCallAt">First call</th>
+        <th data-sort="lastCallAt">Last call</th>
+      </tr>
+    </thead>
+    <tbody id="userRows"></tbody>
+  </table>
+
+  <div class="section-title">Activity & break timeline</div>
+  <div id="timelines" style="background: #1e293b; border: 1px solid #334155; border-radius: 10px;"></div>
+</div>
+
+<script>
+const REFRESH_MS = 30_000;
+let lastData = null;
+let sortKey = 'calls';
+let sortDir = -1;
+let pollTimer = null;
+
+const dateInput = document.getElementById('dateInput');
+const statusDot = document.getElementById('statusDot');
+const statusText = document.getElementById('statusText');
+const lastUpdated = document.getElementById('lastUpdated');
+const refreshBtn = document.getElementById('refreshBtn');
+const errorBox = document.getElementById('errorBox');
+
+function todayLocal() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function fmtSecs(s) {
+  if (!s) return '0m';
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+  if (h) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function fmtTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+async function load() {
+  const date = dateInput.value || todayLocal();
+  statusText.textContent = 'fetching…';
+  try {
+    const res = await fetch(`/api/calls?date=${encodeURIComponent(date)}`);
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+    lastData = json;
+    errorBox.innerHTML = '';
+    statusDot.classList.remove('err');
+    statusText.textContent = 'live';
+    lastUpdated.textContent = `updated ${new Date(json.fetchedAt).toLocaleTimeString()}`;
+    render();
+  } catch (e) {
+    statusDot.classList.add('err');
+    statusText.textContent = 'error';
+    errorBox.innerHTML = `<div class="error">Failed to load: ${e.message}</div>`;
+  }
+}
+
+function render() {
+  if (!lastData) return;
+  const { totals, users, shift } = lastData;
+
+  document.getElementById('summary').innerHTML = `
+    <div class="card"><div class="label">Total calls</div><div class="value">${totals.calls}</div><div class="sub">in shift window</div></div>
+    <div class="card in"><div class="label">Incoming</div><div class="value">${totals.incoming}</div></div>
+    <div class="card out"><div class="label">Outgoing</div><div class="value">${totals.outgoing}</div></div>
+    <div class="card"><div class="label">Active users</div><div class="value">${users.length}</div></div>
+    <div class="card"><div class="label">Shift window</div><div class="value" style="font-size:18px">${fmtTime(shift.start)} – ${fmtTime(shift.end)}</div><div class="sub">${shift.timezone} · break gap ≥ ${shift.breakGapMinutes}m</div></div>
+  `;
+
+  const sorted = [...users].sort((a, b) => {
+    const av = a[sortKey] ?? '', bv = b[sortKey] ?? '';
+    if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * sortDir;
+    return String(av).localeCompare(String(bv)) * sortDir;
+  });
+
+  const rows = document.getElementById('userRows');
+  if (!sorted.length) {
+    rows.innerHTML = `<tr><td colspan="9" class="empty">No calls in this window yet.</td></tr>`;
+  } else {
+    rows.innerHTML = sorted.map(u => `
+      <tr>
+        <td>${escapeHtml(u.name)}</td>
+        <td class="num"><strong>${u.calls}</strong></td>
+        <td class="num"><span class="badge in">${u.incoming}</span></td>
+        <td class="num"><span class="badge out">${u.outgoing}</span></td>
+        <td class="num">${fmtSecs(u.totalCallSeconds)}</td>
+        <td class="num">${u.breakCount}</td>
+        <td class="num">${fmtSecs(u.totalBreakSeconds)}</td>
+        <td>${fmtTime(u.firstCallAt)}</td>
+        <td>${fmtTime(u.lastCallAt)}</td>
+      </tr>
+    `).join('');
+  }
+
+  const timelines = document.getElementById('timelines');
+  if (!sorted.length) {
+    timelines.innerHTML = `<div class="empty">No timeline data yet.</div>`;
+    return;
+  }
+  const shiftStartMs = new Date(shift.start).getTime();
+  const shiftEndMs = new Date(shift.end).getTime();
+  const span = Math.max(1, shiftEndMs - shiftStartMs);
+
+  timelines.innerHTML = sorted.map(u => {
+    const callBars = u.callIntervals.map(ci => {
+      const s = new Date(ci.startAt).getTime();
+      const e = new Date(ci.endAt).getTime();
+      const left = ((Math.max(s, shiftStartMs) - shiftStartMs) / span) * 100;
+      const width = Math.max(0.4, ((Math.min(e, shiftEndMs) - Math.max(s, shiftStartMs)) / span) * 100);
+      return `<div class="timeline-call" style="left:${left}%; width:${width}%"></div>`;
+    }).join('');
+    const breakBars = u.breaks.map(b => {
+      const s = new Date(b.startAt).getTime();
+      const e = new Date(b.endAt).getTime();
+      const left = ((s - shiftStartMs) / span) * 100;
+      const width = ((e - s) / span) * 100;
+      return `<div class="timeline-break" style="left:${left}%; width:${width}%" title="Break ${fmtSecs(b.durationSec)} (${fmtTime(b.startAt)}–${fmtTime(b.endAt)})"></div>`;
+    }).join('');
+    return `
+      <div class="timeline-row">
+        <div class="timeline-name">
+          <span>${escapeHtml(u.name)}</span>
+          <span class="stats">${u.calls} calls · ${fmtSecs(u.totalCallSeconds)} talk · ${u.breakCount} breaks (${fmtSecs(u.totalBreakSeconds)})</span>
+        </div>
+        <div class="timeline-bar">${breakBars}${callBars}</div>
+        <div class="timeline-axis"><span>${fmtTime(shift.start)}</span><span>${fmtTime(shift.end)}</span></div>
+      </div>
+    `;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+document.querySelectorAll('th[data-sort]').forEach(th => {
+  th.addEventListener('click', () => {
+    const k = th.dataset.sort;
+    if (sortKey === k) sortDir *= -1;
+    else { sortKey = k; sortDir = -1; }
+    render();
+  });
+});
+
+dateInput.value = todayLocal();
+dateInput.addEventListener('change', load);
+refreshBtn.addEventListener('click', load);
+
+load();
+pollTimer = setInterval(load, REFRESH_MS);
+</script>
+</body>
+</html>
